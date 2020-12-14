@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="lib" path="/pasa_cbentley_core_src4/libs/cldcapi11.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/pasa_cbentley_core_src4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/pasa_cbentley_framework_coreui_src4"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/pasa_cbentley_byteobjects_src4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/pasa_cbentley_framework_coredata_src4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/pasa_cbentley_framework_coredraw_src4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/pasa_cbentley_framework_coreio_src4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/java_src4_compat_j2se"/>
 </classpath>
