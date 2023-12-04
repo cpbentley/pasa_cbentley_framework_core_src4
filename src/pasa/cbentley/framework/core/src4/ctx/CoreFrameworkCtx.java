@@ -11,30 +11,27 @@ import pasa.cbentley.byteobjects.src4.interfaces.StatorReaderBO;
 import pasa.cbentley.byteobjects.src4.interfaces.StatorWriterBO;
 import pasa.cbentley.core.src4.ctx.ACtx;
 import pasa.cbentley.core.src4.ctx.ICtx;
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.event.EventBusArray;
 import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.event.ILifeContext;
 import pasa.cbentley.core.src4.event.ILifeListener;
+import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.interfaces.ITimeCtrl;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.framework.core.src4.app.IConfigApp;
+import pasa.cbentley.framework.core.src4.app.IStringsCoreFramework;
 import pasa.cbentley.framework.core.src4.engine.CoordinatorAbstract;
-import pasa.cbentley.framework.core.src4.engine.LaunchValues;
 import pasa.cbentley.framework.core.src4.interfaces.IAPIService;
 import pasa.cbentley.framework.core.src4.interfaces.IDependencies;
 import pasa.cbentley.framework.core.src4.interfaces.IHost;
 import pasa.cbentley.framework.core.src4.interfaces.IHostUITools;
 import pasa.cbentley.framework.core.src4.interfaces.ILauncherHost;
 import pasa.cbentley.framework.core.src4.interfaces.ITechFeaturesHost;
-import pasa.cbentley.framework.core.src4.interfaces.ITechHost;
 import pasa.cbentley.framework.coredata.src4.ctx.CoreDataCtx;
-import pasa.cbentley.framework.coredata.src4.db.IByteRecordStoreFactory;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
 import pasa.cbentley.framework.coreio.src4.ctx.CoreIOCtx;
 import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
-import pasa.cbentley.framework.coreui.src4.engine.CanvasHostAbstract;
 
 /**
  * Implemented by Swing/J2ME/Android
@@ -56,19 +53,19 @@ import pasa.cbentley.framework.coreui.src4.engine.CanvasHostAbstract;
  */
 public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFramework, ILifeListener {
 
+   private BOModuleCoreFramework boModule;
+
    protected final CoreUiCtx     cuc;
-
-   private EventBusArray         eventBus;
-
-   private IntToObjects          services;
-
-   protected final ILauncherHost launcher;
-
-   protected final CoreIOCtx     ioc;
 
    protected final CoreDataCtx   dac;
 
-   private BOModuleCoreFramework boModule;
+   private EventBusArray         eventBus;
+
+   protected final CoreIOCtx     ioc;
+
+   protected final ILauncherHost launcher;
+
+   private IntToObjects          services;
 
    public CoreFrameworkCtx(IConfigCoreFramework config, CoreUiCtx cuc, CoreDataCtx dac, CoreIOCtx ioc, ILauncherHost launcher) {
       super(config, cuc.getBOC());
@@ -78,72 +75,13 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
       this.launcher = launcher;
       services = new IntToObjects(uc);
       eventBus = new EventBusArray(uc, this, getEventBaseTopology());
-      
-      boModule = new BOModuleCoreFramework(this);
-      
-   }
 
-   protected void matchConfig(IConfigBO config, ByteObject settings) {
+      boModule = new BOModuleCoreFramework(this);
 
    }
 
    protected void applySettings(ByteObject settingsNew, ByteObject settingsOld) {
 
-   }
-
-   public ICtx[] getCtxSub() {
-      return new ICtx[] { cuc, ioc, dac };
-   }
-
-   public CoreDataCtx getCoreDataCtx() {
-      return dac;
-   }
-
-   public IConfigApp getConfigApp() {
-      return null;
-   }
-
-   public CoreIOCtx getCoreIOCtx() {
-      return ioc;
-   }
-
-   /**
-    * The launcher that created this context. 
-    * @return
-    */
-   public ILauncherHost getLauncherHost() {
-      return launcher;
-   }
-
-   public void lifeStarted(ILifeContext context) {
-
-   }
-
-   public void lifePaused(ILifeContext context) {
-      for (int i = 0; i < services.getSize(); i++) {
-         Object o = services.getObjectAtIndex(i);
-         if (o instanceof IAPIService) {
-            ((IAPIService) o).lifePaused(context);
-         }
-      }
-   }
-
-   public void lifeResumed(ILifeContext context) {
-      for (int i = 0; i < services.getSize(); i++) {
-         Object o = services.getObjectAtIndex(i);
-         if (o instanceof IAPIService) {
-            ((IAPIService) o).lifeResumed(context);
-         }
-      }
-   }
-
-   public void lifeStopped(ILifeContext context) {
-      for (int i = 0; i < services.getSize(); i++) {
-         Object o = services.getObjectAtIndex(i);
-         if (o instanceof IAPIService) {
-            ((IAPIService) o).lifeStopped(context);
-         }
-      }
    }
 
    /**
@@ -197,14 +135,6 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
       return null;
    }
 
-   /**
-    * Overrides any object at given id
-    */
-   public boolean registerServiceProvider(Object service, int id) {
-      services.add(id, service);
-      return true;
-   }
-
    public BOCtx getBOC() {
       return cuc.getBOC();
    }
@@ -216,8 +146,24 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
       return ITechCtxSettingsCoreFramework.CTX_COREFW_BASIC_SIZE;
    }
 
+   public IConfigApp getConfigApp() {
+      return null;
+   }
+
    public CoordinatorAbstract getCoordinator() {
       return launcher.getCoordinator();
+   }
+
+   public CoreDataCtx getCoreDataCtx() {
+      return dac;
+   }
+
+   public CoreIOCtx getCoreIOCtx() {
+      return ioc;
+   }
+
+   public ICtx[] getCtxSub() {
+      return new ICtx[] { cuc, ioc, dac };
    }
 
    public CoreUiCtx getCUC() {
@@ -240,7 +186,34 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
 
    public abstract IHost getHost();
 
+   /**
+    * Possible launchers for.
+    * 
+    * Framed, Panel.. It will depends on the calling launcher and the app.
+    * 
+    * In 
+    * @param cl
+    * @return
+    */
+   public ILauncherHost[] getHostLaunchers(Class cl) {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   public ILauncherHost[] getHostLaunchers(String cl) {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
    public abstract IHostUITools getHostTools();
+
+   /**
+    * The launcher that created this context. 
+    * @return
+    */
+   public ILauncherHost getLauncherHost() {
+      return launcher;
+   }
 
    /**
     * Default implementation just calls {@link Class#getResourceAsStream(String)}
@@ -250,6 +223,7 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
     * @return
     */
    public InputStream getResourceAsStream(String name) throws IOException {
+      //TODO remove and use IOUTILS
       String m = getResourcePath(name);
       InputStream is = getClass().getResourceAsStream(m);
       return is;
@@ -269,6 +243,21 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
     * @return not null
     */
    public abstract String[] getStackTrace(Throwable e);
+
+   /**
+    * <li> {@link IStringsKernel#SID_STRINGS_1}
+    * @param type
+    * @param key
+    * @return -1 if not found
+    */
+   public int getStaticKeyRegistrationID(int type, int key) {
+      if (type == IStringsKernel.SID_STRINGS_1) {
+         if (key >= IStringsCoreFramework.ACORE_F_STR_A && key <= IStringsCoreFramework.ACORE_F_STR_Z) {
+            return key - IStringsCoreFramework.ACORE_F_STR_A;
+         }
+      }
+      return -1;
+   }
 
    /**
     * String ID identifying the Host.
@@ -313,12 +302,47 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
       return false;
    }
 
-   public void stateReadAppUi(StatorReaderBO state) {
-      cuc.stateReadAppUi(state);
+   public void lifePaused(ILifeContext context) {
+      for (int i = 0; i < services.getSize(); i++) {
+         Object o = services.getObjectAtIndex(i);
+         if (o instanceof IAPIService) {
+            ((IAPIService) o).lifePaused(context);
+         }
+      }
    }
 
-   public void stateWriteAppUi(StatorWriterBO state) {
-      cuc.stateWriteAppUi(state);
+   public void lifeResumed(ILifeContext context) {
+      for (int i = 0; i < services.getSize(); i++) {
+         Object o = services.getObjectAtIndex(i);
+         if (o instanceof IAPIService) {
+            ((IAPIService) o).lifeResumed(context);
+         }
+      }
+   }
+
+   public void lifeStarted(ILifeContext context) {
+
+   }
+
+   public void lifeStopped(ILifeContext context) {
+      for (int i = 0; i < services.getSize(); i++) {
+         Object o = services.getObjectAtIndex(i);
+         if (o instanceof IAPIService) {
+            ((IAPIService) o).lifeStopped(context);
+         }
+      }
+   }
+
+   protected void matchConfig(IConfigBO config, ByteObject settings) {
+
+   }
+
+   /**
+    * Overrides any object at given id
+    */
+   public boolean registerServiceProvider(Object service, int id) {
+      services.add(id, service);
+      return true;
    }
 
    /**
@@ -336,23 +360,12 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
       return true;
    }
 
-   /**
-    * Possible launchers for.
-    * 
-    * Framed, Panel.. It will depends on the calling launcher and the app.
-    * 
-    * In 
-    * @param cl
-    * @return
-    */
-   public ILauncherHost[] getHostLaunchers(Class cl) {
-      // TODO Auto-generated method stub
-      return null;
+   public void stateReadAppUi(StatorReaderBO state) {
+      cuc.stateReadAppUi(state);
    }
 
-   public ILauncherHost[] getHostLaunchers(String cl) {
-      // TODO Auto-generated method stub
-      return null;
+   public void stateWriteAppUi(StatorWriterBO state) {
+      cuc.stateWriteAppUi(state);
    }
 
    //#mdebug
@@ -370,14 +383,14 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
       dc.nlLvl(launcher, "launcher");
    }
 
-   private void toStringPrivate(Dctx dc) {
-
-   }
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, CoreFrameworkCtx.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+
    }
 
    //#enddebug

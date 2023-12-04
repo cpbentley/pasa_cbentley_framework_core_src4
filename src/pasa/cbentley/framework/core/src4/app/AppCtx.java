@@ -5,6 +5,7 @@ import pasa.cbentley.byteobjects.src4.ctx.ABOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IConfigBO;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
+import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.interfaces.IAInitable;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.thread.WorkerThread;
@@ -24,6 +25,9 @@ import pasa.cbentley.framework.coreui.src4.ctx.ITechCtxSettingsCoreUI;
  * 
  * The {@link HostCtx} and {@link CanvasCtx} is given by the {@link ILauncherHost}
  * 
+ * <p>
+ * Attention SubClasses! : You must class guard call {@link AppCtx#a_Init()} at the end of the constructor.
+ * </p>
  * @author Charles Bentley
  *
  */
@@ -55,7 +59,7 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, ITechCtxSetti
    public void a_Init() {
       super.a_Init();
    }
-   
+
    public AppCtx(IConfigApp configApp, CoreFrameworkCtx cfc, IStringProducer stringProducer) {
       super(configApp, cfc.getBOC());
       if (configApp == null) {
@@ -67,15 +71,22 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, ITechCtxSetti
    }
 
    protected void matchConfig(IConfigBO config, ByteObject settings) {
-      IConfigApp configApp = (IConfigApp)config;
+      IConfigApp configApp = (IConfigApp) config;
       settings.setFlag(CTX_APP_OFFSET_02_FLAGX, CTX_APP_FLAGX_2_DRAG_DROP, configApp.isAppDragDropEnabled());
-
    }
 
+   /**
+    * App is able to interpret the {@link ByteObject} values
+    */
    protected void applySettings(ByteObject settingsNew, ByteObject settingsOld) {
+      settingsNew.checkType(CTX_BASIC_TYPE);
+      if (settingsOld != null) {
+         settingsOld.checkType(CTX_BASIC_TYPE);
+      }
+
       //forward drag setting to the coreui
       boolean appDrag = settingsNew.hasFlag(CTX_APP_OFFSET_02_FLAGX, CTX_APP_FLAGX_2_DRAG_DROP);
-      
+
       ByteObject settingsBO = cfc.getCUC().getSettingsBOForModification();
       settingsBO.setFlag(ITechCtxSettingsCoreUI.CTX_COREUI_OFFSET_01_FLAG1, ITechCtxSettingsCoreUI.CTX_COREUI_FLAG_2_DRAG_DROP, appDrag);
       cfc.getCUC().applyChanges(settingsBO);
@@ -84,7 +95,7 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, ITechCtxSetti
    public ICtx[] getCtxSub() {
       return new ICtx[] { cfc };
    }
-   
+
    /**
     * Returns a String of this App version.
     * 

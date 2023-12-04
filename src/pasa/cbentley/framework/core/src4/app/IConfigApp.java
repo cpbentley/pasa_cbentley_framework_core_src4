@@ -17,10 +17,32 @@ import pasa.cbentley.framework.coreui.src4.ctx.IConfigCoreUI;
  */
 public interface IConfigApp extends IConfigBO {
 
+   /**
+    * Clone the configuration with a different name
+    * @param uc
+    * @param name
+    * @return
+    */
    public IConfigApp cloneMe(UCtx uc, String name);
 
+   /**
+    * The Application icon is a configuration item.
+    * 
+    * One reason is that when the application is cloned into a second window, its icon can be configured
+    * so that the host frame displays a different icon.
+    * 
+    * @return
+    */
    public String getAppIcon();
 
+   /**
+    * The Application name is a configuration item.
+    * 
+    * One reason is that when the application is cloned into a second window, its name must be configured
+    * so that the host frame displays a different name.
+    * 
+    * @return
+    */
    public String getAppName();
 
    /**

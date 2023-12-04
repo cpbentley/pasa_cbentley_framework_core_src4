@@ -13,7 +13,9 @@ import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.i8n.LString;
 import pasa.cbentley.core.src4.i8n.LocaleID;
 import pasa.cbentley.core.src4.i8n.StringProducerAbstract;
+import pasa.cbentley.core.src4.io.FileLineReader;
 import pasa.cbentley.core.src4.io.FileReader;
+import pasa.cbentley.core.src4.io.LineReaderIntToStrings;
 import pasa.cbentley.core.src4.io.XString;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.structs.IntToObjects;
@@ -72,7 +74,7 @@ public class StringProducerBasic extends StringProducerAbstract implements IStri
    private void addMap(ICtx cl, String path) {
       //no loading
       try {
-         IntToStrings its = readStrings(path);
+         IntToStrings its = readStrings2(path);
          if (its != null) {
             addMap(cl, its);
          }
@@ -173,6 +175,8 @@ public class StringProducerBasic extends StringProducerAbstract implements IStri
    }
 
    public void setValue(ICtx cl, LocaleID lid, int key, String string) {
+      //0 based string id index. we must convert the key from 5001 to 1..
+      //
       int stringID = cl.getStaticKeyRegistrationID(IStringsKernel.SID_STRINGS_1, key);
       if (stringID == -1) {
          throw new IllegalArgumentException("key=" + key + " " + string);
@@ -182,6 +186,7 @@ public class StringProducerBasic extends StringProducerAbstract implements IStri
       if (data[regid] == null) {
          data[regid] = new IntToStrings(uc);
       }
+      stringID--; //minus one because we go from 1based index to 0based index
       data[regid].setSafe(stringID, string);
    }
 
@@ -200,6 +205,30 @@ public class StringProducerBasic extends StringProducerAbstract implements IStri
       addMap(cl, pathid);
    }
 
+   /**
+    * Read Strings from filename
+    * @param name
+    * @return
+    * @throws IOException
+    */
+   public IntToStrings readStrings2(String name) throws IOException {
+      String suffix = "en";
+      String file = name + "_" + suffix + ".txt";
+      //look up the file with 
+      IntToStrings its = new IntToStrings(uc);
+      LineReaderIntToStrings lineReader = new LineReaderIntToStrings(its);
+      FileLineReader flr = new FileLineReader(uc, lineReader, file);
+      flr.setCharAvoid('#');
+      flr.read(file);
+      return its;
+   }
+
+   /**
+    * Read Strings from filename
+    * @param name
+    * @return
+    * @throws IOException
+    */
    public IntToStrings readStrings(String name) throws IOException {
       String suffix = "en";
       String file = name + "_" + suffix + ".txt";
@@ -229,7 +258,7 @@ public class StringProducerBasic extends StringProducerAbstract implements IStri
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, StringProducerBasic.class,232);
+      dc.root(this, StringProducerBasic.class, 232);
       dc.nlLvl("CurrentLocale", current);
       dc.nlLvlArray1Line(lids, "Locales");
       dc.append("Registered Module Paths");
