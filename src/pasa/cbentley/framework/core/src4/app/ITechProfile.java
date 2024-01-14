@@ -1,6 +1,6 @@
 package pasa.cbentley.framework.core.src4.app;
 
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 
 /**
  * Stores user related settings. Shareable between midlets and applications. (this user de
@@ -27,7 +27,7 @@ import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
  * @author Mordan
  *
  */
-public interface ITechProfile extends ITechByteObject {
+public interface ITechProfile extends IByteObject {
 
    public static final int PROFILE_BASIC_SIZE              = A_OBJECT_BASIC_SIZE + 35;
 

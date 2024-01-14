@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.core.src4.interfaces;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 
 /**
  * 
@@ -10,7 +10,7 @@ import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
  * @author Charles-Philip
  *
  */
-public interface ITechHost extends ITechByteObject {
+public interface ITechHost extends IByteObject {
 
    public static final int HOST_BASIC_SIZE                       = A_OBJECT_BASIC_SIZE + 30;
 

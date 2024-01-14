@@ -1,6 +1,6 @@
 package pasa.cbentley.framework.core.src4.interfaces;
 
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.core.src4.interfaces.ITech;
 import pasa.cbentley.framework.core.src4.app.IAppli;
 import pasa.cbentley.framework.coreui.src4.tech.ITechFeaturesUI;

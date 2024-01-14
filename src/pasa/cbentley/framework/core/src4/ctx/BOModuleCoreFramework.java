@@ -17,12 +17,12 @@ public class BOModuleCoreFramework extends BOModuleAbstract {
       this.cfc = cfc;
    }
 
-   public String getIDString(int did, int value) {
+   public String toStringGetDIDString(int did, int value) {
       // TODO Auto-generated method stub
       return null;
    }
 
-   public ByteObject getFlagOrdered(ByteObject bo, int offset, int flag) {
+   public ByteObject getFlagOrderedBO(ByteObject bo, int offset, int flag) {
       // TODO Auto-generated method stub
       return null;
    }

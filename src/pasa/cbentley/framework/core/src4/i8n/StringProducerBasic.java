@@ -6,10 +6,10 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import pasa.cbentley.core.src4.ctx.ICtx;
+import pasa.cbentley.core.src4.ctx.IStaticIDs;
 import pasa.cbentley.core.src4.i8n.IString;
 import pasa.cbentley.core.src4.i8n.IStringMapper;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
-import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.i8n.LString;
 import pasa.cbentley.core.src4.i8n.LocaleID;
 import pasa.cbentley.core.src4.i8n.StringProducerAbstract;
@@ -125,7 +125,7 @@ public class StringProducerBasic extends StringProducerAbstract implements IStri
       //ask everymodule if that string key belongs to him   
       for (int i = 0; i < ictxs.nextempty; i++) {
          ICtx ctx = (ICtx) ictxs.objects[i];
-         int stringID = ctx.getStaticKeyRegistrationID(IStringsKernel.SID_STRINGS_1, key);
+         int stringID = ctx.getStaticKeyRegistrationID(IStaticIDs.SID_STRINGS, key);
          if (stringID != -1) {
             stringID--; //minus 1 because String ID starts at 1 to match the line number in the text file
             //
@@ -177,7 +177,7 @@ public class StringProducerBasic extends StringProducerAbstract implements IStri
    public void setValue(ICtx cl, LocaleID lid, int key, String string) {
       //0 based string id index. we must convert the key from 5001 to 1..
       //
-      int stringID = cl.getStaticKeyRegistrationID(IStringsKernel.SID_STRINGS_1, key);
+      int stringID = cl.getStaticKeyRegistrationID(IStaticIDs.SID_STRINGS, key);
       if (stringID == -1) {
          throw new IllegalArgumentException("key=" + key + " " + string);
       }

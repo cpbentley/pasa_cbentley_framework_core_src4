@@ -7,10 +7,11 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.ABOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IConfigBO;
-import pasa.cbentley.byteobjects.src4.interfaces.StatorReaderBO;
-import pasa.cbentley.byteobjects.src4.interfaces.StatorWriterBO;
+import pasa.cbentley.byteobjects.src4.stator.StatorReaderBO;
+import pasa.cbentley.byteobjects.src4.stator.StatorWriterBO;
 import pasa.cbentley.core.src4.ctx.ACtx;
 import pasa.cbentley.core.src4.ctx.ICtx;
+import pasa.cbentley.core.src4.ctx.IStaticIDs;
 import pasa.cbentley.core.src4.event.EventBusArray;
 import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.event.ILifeContext;
@@ -245,13 +246,13 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
    public abstract String[] getStackTrace(Throwable e);
 
    /**
-    * <li> {@link IStringsKernel#SID_STRINGS_1}
+    * <li> {@link IStringsKernel#SID_STRINGS}
     * @param type
     * @param key
     * @return -1 if not found
     */
    public int getStaticKeyRegistrationID(int type, int key) {
-      if (type == IStringsKernel.SID_STRINGS_1) {
+      if (type == IStaticIDs.SID_STRINGS) {
          if (key >= IStringsCoreFramework.ACORE_F_STR_A && key <= IStringsCoreFramework.ACORE_F_STR_Z) {
             return key - IStringsCoreFramework.ACORE_F_STR_A;
          }

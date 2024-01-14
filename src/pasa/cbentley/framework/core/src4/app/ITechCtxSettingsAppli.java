@@ -1,6 +1,6 @@
 package pasa.cbentley.framework.core.src4.app;
 
-import pasa.cbentley.byteobjects.src4.tech.ITechCtxSettings;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOCtxSettings;
 import pasa.cbentley.framework.core.src4.interfaces.ITechHost;
 
 /**
@@ -26,7 +26,7 @@ import pasa.cbentley.framework.core.src4.interfaces.ITechHost;
  * @author Charles-Philip Bentley
  *
  */
-public interface ITechCtxSettingsAppli extends ITechCtxSettings {
+public interface ITechCtxSettingsAppli extends IBOCtxSettings {
 
    public static final int CTX_APP_ALIAS_0_BEST                 = 0;
 
