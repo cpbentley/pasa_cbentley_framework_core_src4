@@ -8,8 +8,10 @@ import pasa.cbentley.core.src4.i8n.IStringProducer;
 import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.interfaces.IAInitable;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.stator.IStatorFactory;
 import pasa.cbentley.core.src4.thread.WorkerThread;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
+import pasa.cbentley.framework.core.src4.ctx.IBOTypesCoreFramework;
 import pasa.cbentley.framework.core.src4.engine.CoordinatorAbstract;
 import pasa.cbentley.framework.core.src4.i8n.StringProducerBasic;
 import pasa.cbentley.framework.core.src4.interfaces.ILauncherHost;
@@ -31,7 +33,7 @@ import pasa.cbentley.framework.coreui.src4.ctx.ITechCtxSettingsCoreUI;
  * @author Charles Bentley
  *
  */
-public abstract class AppCtx extends ABOCtx implements IAInitable, ITechCtxSettingsAppli {
+public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSettingsAppli {
 
    protected final CoreFrameworkCtx cfc;
 
@@ -46,6 +48,8 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, ITechCtxSetti
     */
    protected String                 version = "1.0";
 
+   private IStatorFactory           statorFactory;
+
    public AppCtx(IConfigApp configApp, CoreFrameworkCtx cfc) {
       super(configApp, cfc.getBOC());
       if (configApp == null) {
@@ -58,6 +62,13 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, ITechCtxSetti
 
    public void a_Init() {
       super.a_Init();
+   }
+
+   public IStatorFactory getStatorFactory() {
+      if (statorFactory == null) {
+         statorFactory = new StatorFactoryApp(this);
+      }
+      return statorFactory;
    }
 
    public AppCtx(IConfigApp configApp, CoreFrameworkCtx cfc, IStringProducer stringProducer) {
@@ -112,11 +123,23 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, ITechCtxSetti
    }
 
    public int getBOCtxSettingSize() {
-      return ITechCtxSettingsAppli.CTX_APP_BASIC_SIZE;
+      return IBOCtxSettingsAppli.CTX_APP_BASIC_SIZE;
    }
 
    public CoreFrameworkCtx getCFC() {
       return cfc;
+   }
+
+   /**
+    * {@link IBOProfileApp}
+    * 
+    * @return
+    */
+   public ByteObject createEmptyProfile() {
+      int type = IBOTypesCoreFramework.FTYPE_3_PROFILE;
+      int size = IBOProfileApp.PROFILE_BASIC_SIZE;
+      ByteObject bo = getBOC().getByteObjectFactory().createByteObject(type, size);
+      return bo;
    }
 
    public IConfigApp getConfigApp() {

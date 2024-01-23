@@ -1,93 +1,63 @@
 package pasa.cbentley.framework.core.src4.engine;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.src4.ctx.IBOTypesCoreFramework;
-import pasa.cbentley.framework.core.src4.interfaces.IHost;
+import pasa.cbentley.framework.core.src4.ctx.ObjectCFC;
+import pasa.cbentley.framework.core.src4.interfaces.IHostCore;
 import pasa.cbentley.framework.core.src4.interfaces.ITechDataHost;
-import pasa.cbentley.framework.core.src4.interfaces.ITechHost;
+import pasa.cbentley.framework.core.src4.interfaces.ITechHostCore;
+import pasa.cbentley.framework.core.src4.interfaces.IBOHost;
+import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.coreui.src4.event.GestureArea;
+import pasa.cbentley.framework.coreui.src4.interfaces.IHostUI;
 
-public abstract class CoreHostAbstract implements IHost, ITechHost, IStringable {
+public abstract class CoreHostAbstract extends ObjectCFC implements IHostCore, IBOHost, ITechHostCore, IStringable {
 
    /**
-    * {@link ITechHost}.
+    * {@link IBOHost}.
     * Fields filled by the specific framework driver
     */
-   protected ByteObject             techHost;
-
-   protected final CoreFrameworkCtx cfc;
+   protected ByteObject techHost;
 
    public CoreHostAbstract(CoreFrameworkCtx cfc) {
-      this.cfc = cfc;
-      techHost = cfc.getBOC().getByteObjectFactory().createByteObject(IBOTypesCoreFramework.FTYPE_2_HOST, ITechHost.HOST_BASIC_SIZE);
+      super(cfc);
+      techHost = cfc.getBOC().getByteObjectFactory().createByteObject(IBOTypesCoreFramework.FTYPE_2_HOST, IBOHost.HOST_BASIC_SIZE);
    }
 
    public ByteObject getTechHost() {
       return techHost;
    }
 
-   public CoreFrameworkCtx getCFC() {
-      return cfc;
+   public CoreUiCtx getCUC() {
+      return cfc.getCUC();
    }
 
-   /**
-    * Returns actual live screen config creates a new object.
-    * <br>
-    * Type is {@link ITypesCore#TYPE_007_LIT_ARRAY_INT}.
-    * The first value being number of screens.
-    * and then w,h couples for each screens.
-    * <br>
-    * Thus. This config object does not represent screen positioning relative to each other.
-    * @return
-    */
-   public ByteObject getScreenConfigLive() {
-      GestureArea[] val = (GestureArea[]) this.getHostObject(ITechDataHost.DATA_ID_OBJ_01_SCREENS);
+   public IHostUI getHostUI() {
+      return getCUC().getHostUI();
+   }
 
-      int[] ar = new int[1 + (val.length * 2)];
-      ar[0] = val.length;
-      int index = 1;
-      for (int i = 0; i < val.length; i++) {
-         ar[index++] = val[i].w;
-         ar[index++] = val[i].h;
-      }
-      ByteObject bo = cfc.getBOC().getLitteralIntFactory().getIntArrayBO(ar);
-      return bo;
+   public ByteObject getBOHostUI() {
+      return getCUC().getHostUI().getBOHostUI();
    }
 
    //#mdebug
-   public IDLog toDLog() {
-      return toStringGetUCtx().toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "AbstractHost");
+      dc.root(this, CoreHostAbstract.class, 70);
       toStringPrivate(dc);
+      super.toString(dc.sup());
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, CoreHostAbstract.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    private void toStringPrivate(Dctx dc) {
 
-   }
-
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "AbstractHost");
-      toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return cfc.getUCtx();
    }
 
    //#enddebug

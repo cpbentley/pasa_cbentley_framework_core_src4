@@ -46,9 +46,11 @@ public interface IConfigApp extends IConfigBO {
    public String getAppName();
 
    /**
-    * {@link ITechCtxSettingsAppli#CTX_APP_FLAGX_2_DRAG_DROP}
+    * {@link IBOCtxSettingsAppli#CTX_APP_FLAGX_2_DRAG_DROP}
     * @return
     */
    public boolean isAppDragDropEnabled();
+
+   public String getProfileNameDef();
 
 }

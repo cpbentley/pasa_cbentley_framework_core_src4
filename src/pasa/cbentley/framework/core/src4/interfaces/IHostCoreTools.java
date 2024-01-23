@@ -17,7 +17,7 @@ import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasHost;
  * @author Charles Bentley
  *
  */
-public interface IHostUITools {
+public interface IHostCoreTools {
 
    /**
     * Should it not be a canvas feature?

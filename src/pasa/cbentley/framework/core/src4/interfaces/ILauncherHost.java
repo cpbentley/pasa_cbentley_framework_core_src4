@@ -9,6 +9,7 @@ import pasa.cbentley.framework.core.src4.app.IAppli;
 import pasa.cbentley.framework.core.src4.app.IConfigApp;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.src4.engine.CoordinatorAbstract;
+import pasa.cbentley.framework.coredata.src4.stator.StatorCoreData;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasOwner;
 
 /**
@@ -48,6 +49,8 @@ public interface ILauncherHost extends IStringable {
 
    public IDependencies getDependencies();
 
+   public void addStatorFactories(StatorCoreData stator);
+      
    /**
     * Assigns the {@link ILauncherAppli} and creates the {@link IAppli} with the {@link ILauncherAppli#createAppOnFramework(CoreFrameworkCtx)}.
     * 

@@ -2,15 +2,25 @@ package pasa.cbentley.framework.core.src4.interfaces;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
+import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
+import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
+import pasa.cbentley.framework.coreui.src4.interfaces.IHostGestures;
 
 /**
  * 
  * Allows host settings to be saved to a {@link ByteObject}
  * 
+ * We are located in the {@link CoreFrameworkCtx} so we know about all the draw/events options
+ * 
+ * {@link CoreUiCtx} talks to us with {@link IHostGestures}
+ * we provide Gestures settings with
+ * <li> {@link IBOHost#HOST_OFFSET_17_TOUCH_SLOP2};
+ *
+ * 
  * @author Charles-Philip
  *
  */
-public interface ITechHost extends IByteObject {
+public interface IBOHost extends IByteObject {
 
    public static final int HOST_BASIC_SIZE                       = A_OBJECT_BASIC_SIZE + 30;
 

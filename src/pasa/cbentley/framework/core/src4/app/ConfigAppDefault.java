@@ -1,6 +1,7 @@
 package pasa.cbentley.framework.core.src4.app;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.framework.coredraw.src4.ctx.IConfigCoreDraw;
 import pasa.cbentley.framework.coreui.src4.ctx.IConfigCoreUI;
 
@@ -41,5 +42,26 @@ public class ConfigAppDefault extends ConfigAppAbstract {
    public IConfigApp cloneMe(UCtx uc, String name) {
       return new ConfigAppDefault(uc, name);
    }
+   
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, ConfigAppDefault.class, 50);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+   }
+
+   private void toStringPrivate(Dctx dc) {
+      
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, ConfigAppDefault.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
+   }
+
+   //#enddebug
+   
+
 
 }

@@ -2,18 +2,10 @@ package pasa.cbentley.framework.core.src4.ctx;
 
 import pasa.cbentley.core.src4.logging.ToStringStaticBase;
 import pasa.cbentley.framework.core.src4.app.ITechAppli;
-import pasa.cbentley.framework.core.src4.interfaces.ITechFeaturesHost;
+import pasa.cbentley.framework.core.src4.interfaces.ITechHostCore;
 
-public class ToStringStaticFrameworkCore extends ToStringStaticBase {
+public class ToStringStaticCoreFramework extends ToStringStaticBase {
 
-   public static String toStringFeature(int feat) {
-      switch (feat) {
-         case ITechFeaturesHost.SUP_ID_38_GAMEPADS:
-            return "GamePads";
-         default:
-            return "UnknownFeature"+feat;
-      }
-   }
    
    public static String toStringState(int state) {
       switch (state) {

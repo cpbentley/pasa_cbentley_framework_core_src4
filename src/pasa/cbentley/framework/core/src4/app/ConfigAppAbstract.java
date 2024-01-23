@@ -45,23 +45,30 @@ public abstract class ConfigAppAbstract extends ConfigAbstractBO implements ICon
       config.isVolatile = this.isVolatile;
    }
 
+   public String getProfileNameDef() {
+      return "default";
+   }
+   
+
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, "ConfigAppAbstract");
+      dc.root(this, ConfigAppAbstract.class, 60);
       toStringPrivate(dc);
       super.toString(dc.sup());
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "ConfigAppAbstract");
+      dc.root1Line(this, ConfigAppAbstract.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }
 
    //#enddebug
+   
+
 
 }

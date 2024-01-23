@@ -5,11 +5,11 @@ import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.stator.IStatorable;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.src4.engine.CoordinatorAbstract;
-import pasa.cbentley.framework.core.src4.interfaces.ITechHost;
+import pasa.cbentley.framework.core.src4.interfaces.IBOHost;
 import pasa.cbentley.framework.coreui.src4.engine.CanvasAppliAbstract;
 import pasa.cbentley.framework.coreui.src4.engine.CanvasHostAbstract;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
-import pasa.cbentley.framework.coreui.src4.tech.ITechCanvasHost;
+import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
 
 /**
  * Interface for the host for controlling the application.
@@ -28,19 +28,19 @@ import pasa.cbentley.framework.coreui.src4.tech.ITechCanvasHost;
  * Visible methods to the {@link CoordinatorAbstract} to interact with the {@link IAppli}.
  * <br>
  * <br>
- * The {@link ITechHost}.
+ * The {@link IBOHost}.
  * <br>
  * Live statis of an {@link IAppli}
  * <li>
  * @author Charles-Philip
  *
  */
-public interface IAppli extends ITechAppli, IStringable, IStatorable {
+public interface IAppli extends ITechAppli, IStringable {
 
    /**
     * This method is called by the {@link CoordinatorAbstract} immediately after creating the {@link IAppli} object
     * <br>
-    * The method {@link IAppli#getTechAppli()} will throw an exception if ams not loaded
+    * The method {@link IAppli#getCtxSettingsAppli()} will throw an exception if ams not loaded
     * 
     * @throws IllegalStateException when state is not {@link ITechAppli#STATE_0_CREATED}
     */
@@ -102,11 +102,11 @@ public interface IAppli extends ITechAppli, IStringable, IStatorable {
     * Each Module Loads its settings 
     * <br>
     * <br>
-    * {@link ITechAppli}
+    * {@link IBOCtxSettingsAppli}
     * @return
-    * @see ITechCtxSettingsAppli
+    * @see IBOCtxSettingsAppli
     */
-   public ByteObject getTechAppli();
+   public ByteObject getCtxSettingsAppli();
 
    /**
     * 
@@ -117,12 +117,12 @@ public interface IAppli extends ITechAppli, IStringable, IStatorable {
    /**
     * Asks the application to create a {@link ICanvasAppli}, usually to meant to be displayed.
     * 
-    * When you want to an existing canvas, the tech must define it, its a special tech
+    * When you want to an existing canvas, the {@link IBOCanvasHost} can define it.
     * 
     * A {@link CanvasAppliAbstract} always has a non null {@link CanvasHostAbstract}
     * 
     * @param id
-    * @param tech when null returns the default canvas for the given id, {@link ITechCanvasHost}
+    * @param tech when null returns the default canvas for the given id, {@link IBOCanvasHost}
     * defining the properties of the canvas.
     * @return
     */

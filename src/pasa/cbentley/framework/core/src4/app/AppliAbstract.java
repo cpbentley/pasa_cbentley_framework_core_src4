@@ -1,24 +1,26 @@
 package pasa.cbentley.framework.core.src4.app;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.stator.ITechStateBO;
-import pasa.cbentley.byteobjects.src4.stator.StatorReaderBO;
-import pasa.cbentley.byteobjects.src4.stator.StatorWriterBO;
-import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.byteobjects.src4.stator.ITechStatorBO;
+import pasa.cbentley.core.src4.ctx.CtxManager;
+import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
 import pasa.cbentley.core.src4.i8n.LocaleID;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
+import pasa.cbentley.core.src4.stator.IStatorOwner;
+import pasa.cbentley.core.src4.stator.Stator;
 import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.DateUtils;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
-import pasa.cbentley.framework.core.src4.ctx.ToStringStaticFrameworkCore;
-import pasa.cbentley.framework.core.src4.engine.CoordinatorAbstract;
+import pasa.cbentley.framework.core.src4.ctx.ObjectCFC;
+import pasa.cbentley.framework.core.src4.ctx.ToStringStaticCoreFramework;
+import pasa.cbentley.framework.core.src4.engine.CoreAppModel;
+import pasa.cbentley.framework.core.src4.engine.CoreAppView;
 import pasa.cbentley.framework.coredata.src4.db.IByteStore;
-import pasa.cbentley.framework.coredata.src4.engine.StatorReaderCoreData;
-import pasa.cbentley.framework.coreui.src4.ctx.IBOTypesCoreUI;
+import pasa.cbentley.framework.coredata.src4.stator.StatorCoreData;
+import pasa.cbentley.framework.coredata.src4.stator.StatorReaderCoreData;
 import pasa.cbentley.framework.coreui.src4.engine.CanvasAppliAbstract;
 import pasa.cbentley.framework.coreui.src4.engine.CanvasHostAbstract;
 import pasa.cbentley.framework.coreui.src4.event.BEvent;
@@ -43,11 +45,15 @@ import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
  * @author Charles Bentley
  *
  */
-public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
+public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxSettingsAppli, IStatorOwner {
    /**
     * 
     */
    protected AppCtx        apc;
+
+   private CoreAppModel    coreAppModel;
+
+   private CoreAppView     coreAppView;
 
    /**
     * Application that spawned this instance. 
@@ -69,20 +75,39 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
 
    private int             state;
 
-   private String          storeName;
+   private StatorCoreData  stator;
 
    public AppliAbstract(AppCtx apc) {
+      super(apc.getCFC());
       this.apc = apc;
-
+      state = STATE_0_CREATED;
    }
 
    public void amsAppExit() {
+
       //increment running time value.
       int incr = DateUtils.getMinutes(startTime, System.currentTimeMillis());
-      apc.getSettingsBO().increment(ITechCtxSettingsAppli.CTX_APP_OFFSET_05_RUNNING_TIME4, 4, incr);
+      apc.getSettingsBO().increment(IBOCtxSettingsAppli.CTX_APP_OFFSET_05_RUNNING_TIME4, 4, incr);
       state = STATE_4_DESTROYED;
 
+      amsAppExitWriteStator();
+
       subAppExit();
+   }
+
+   /**
+    * Inverse of {@link AppliAbstract#amsAppLoadStator()}
+    */
+   protected void amsAppExitWriteStator() {
+      //modules outside the app have static settings. This is now all those objects are saved
+      StatorCoreData stator = getStator();
+
+      CtxManager ctxManager = cfc.getUCtx().getCtxManager();
+      ctxManager.stateOwnerWrite(stator);
+
+      this.stateOwnerWrite(stator);
+
+      stator.serializeToStore();
    }
 
    /**
@@ -97,6 +122,18 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
       state = STATE_1_LOADED;
    }
 
+   /**
+    * 
+    */
+   protected void amsAppLoadStator() {
+      StatorCoreData stator = getStator();
+
+      CtxManager ctxManager = cfc.getUCtx().getCtxManager();
+      ctxManager.stateOwnerRead(stator);
+
+      this.stateOwnerRead(stator);
+   }
+
    public void amsAppPause() {
       if (state != STATE_2_STARTED) {
          throwExceptionBadState("Pause");
@@ -107,19 +144,6 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
    }
 
    /**
-    * Return the active (shown) canvas for the Application
-    * @return
-    */
-   public ICanvasAppli[] getCanvasActive() {
-      CanvasHostAbstract[] canvases = apc.getCUC().getCanvasesShown();
-      ICanvasAppli[] appc = new ICanvasAppli[canvases.length];
-      for (int i = 0; i < canvases.length; i++) {
-         appc[i] = canvases[i].getCanvasAppli();
-      }
-      return appc;
-   }
-
-   /**
     * 
     */
    public void amsAppResume() {
@@ -127,11 +151,14 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
          throwExceptionBadState("Resume");
       }
       int incr = DateUtils.getMinutes(pauseTime, System.currentTimeMillis());
-      apc.getSettingsBO().increment(ITechCtxSettingsAppli.CTX_APP_OFFSET_06_STAND_BY_TIME4, 4, incr);
+      apc.getSettingsBO().increment(IBOCtxSettingsAppli.CTX_APP_OFFSET_06_STAND_BY_TIME4, 4, incr);
       subAppUnPaused();
       state = STATE_2_STARTED;
    }
 
+   /**
+    * 
+    */
    public void amsAppStart() {
       if (state == STATE_3_PAUSED) {
          amsAppResume();
@@ -154,7 +181,20 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
    }
 
    /**
-    * Template for starting an application
+    * Template for starting an application called by {@link AppliAbstract#amsAppStart()}
+    * 
+    * <Li> Reads {@link IBOCtxSettingsAppli}
+    * <ol>
+    * <li> If first run, calls install {@link AppliAbstract#subAppFirstLaunch()}
+    * </ol>
+    * <li> {@link LocaleID}
+    * <Li> {@link LocaleID}
+    * <li> {@link AppliAbstract#loadState()}
+    * <li> {@link AppliAbstract#loadCoreAppModel()}
+    * <li> {@link AppliAbstract#loadCoreViewModel()}
+    * <li> {@link AppliAbstract#showCanvasDefault()}
+    * <li> {@link AppliAbstract#subAppStarted()}
+    * 
     * @return
     */
    private void amsAppStartInside() {
@@ -182,9 +222,9 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
 
       // sets the profile
 
-      int appstart = coreStateApp.get2(ITechCtxSettingsAppli.CTX_APP_OFFSET_04_STARTS2);
+      int appstart = coreStateApp.get2(IBOCtxSettingsAppli.CTX_APP_OFFSET_04_STARTS2);
       appstart++;
-      coreStateApp.set2(ITechCtxSettingsAppli.CTX_APP_OFFSET_04_STARTS2, appstart);
+      coreStateApp.set2(IBOCtxSettingsAppli.CTX_APP_OFFSET_04_STARTS2, appstart);
       if (appstart == 1) {
          //follows a scenario of pages.
          //called before installation
@@ -208,8 +248,8 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
 
       //check if previous view state was successfully loaded
 
-      if (getTechAppli().hasFlag(ITechCtxSettingsAppli.CTX_APP_OFFSET_01_FLAG, ITechCtxSettingsAppli.CTX_APP_FLAG_1_HEADLESS)) {
-         
+      if (getCtxSettingsAppli().hasFlag(IBOCtxSettingsAppli.CTX_APP_OFFSET_01_FLAG, IBOCtxSettingsAppli.CTX_APP_FLAG_1_HEADLESS)) {
+
          //#debug
          toDLog().pInit("Headless Flag", this, AppliAbstract.class, "amsAppStartInside", LVL_09_WARNING, false);
          return;
@@ -224,18 +264,36 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
     * 
     */
    public void cmdToggleAlias() {
-      ByteObject appliTech = getTechAppli();
-      int val = appliTech.get1(ITechCtxSettingsAppli.CTX_APP_OFFSET_08_ANTI_ALIAS1);
-      if (val == ITechCtxSettingsAppli.CTX_APP_ALIAS_2_OFF) {
-         val = ITechCtxSettingsAppli.CTX_APP_ALIAS_1_ON;
+      ByteObject appliTech = getCtxSettingsAppli();
+      int val = appliTech.get1(IBOCtxSettingsAppli.CTX_APP_OFFSET_08_ANTI_ALIAS1);
+      if (val == IBOCtxSettingsAppli.CTX_APP_ALIAS_2_OFF) {
+         val = IBOCtxSettingsAppli.CTX_APP_ALIAS_1_ON;
       } else {
-         val = ITechCtxSettingsAppli.CTX_APP_ALIAS_2_OFF;
+         val = IBOCtxSettingsAppli.CTX_APP_ALIAS_2_OFF;
       }
-      appliTech.set1(ITechCtxSettingsAppli.CTX_APP_OFFSET_08_ANTI_ALIAS1, val);
+      appliTech.set1(IBOCtxSettingsAppli.CTX_APP_OFFSET_08_ANTI_ALIAS1, val);
 
       //appli tech changed.. apply them to each canvas ?
 
       CanvasHostAbstract[] canvases = apc.getCFC().getCUC().getCanvases();
+   }
+
+   /**
+    * When Application extends {@link CoreAppModel}, it also has to override this method
+    * @return
+    */
+   public CoreAppModel createAppModel() {
+      if (coreAppModel == null) {
+         coreAppModel = new CoreAppModel(cfc);
+      }
+      return coreAppModel;
+   }
+
+   public CoreAppView createAppView() {
+      if (coreAppView == null) {
+         coreAppView = new CoreAppView(cfc);
+      }
+      return coreAppView;
    }
 
    /**
@@ -260,6 +318,32 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
       return bs;
    }
 
+   public abstract ICanvasAppli getCanvas(int id, ByteObject tech);
+
+   /**
+    * Return the active (shown) canvas for the Application
+    * @return never null. zero length is none
+    */
+   public ICanvasAppli[] getCanvasActive() {
+      CanvasHostAbstract[] canvases = apc.getCUC().getCanvasesShown();
+      ICanvasAppli[] appc = new ICanvasAppli[canvases.length];
+      for (int i = 0; i < canvases.length; i++) {
+         appc[i] = canvases[i].getCanvasAppli();
+      }
+      return appc;
+   }
+
+   public ICtx getCtxOwner() {
+      return apc;
+   }
+
+   /**
+    * @return {@link IBOCtxSettingsAppli}
+    */
+   public ByteObject getCtxSettingsAppli() {
+      return apc.getSettingsBO();
+   }
+
    /**
     * A Container may contains several {@link AppliAbstract}.
     * A Swing windows with 3 applications side by side managed by a pure Swing interface.
@@ -276,13 +360,27 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
    }
 
    /**
-    * {@link ITechProfile}
+    * {@link IBOProfileApp}
+    * 
+    * {@link IBOProfileApp#PROFILE_OFFSET_08_NAME15}
+    * 
     * @return
     */
    public ByteObject getProfileActive() {
+      if (profileActive == null) {
+         profileActive = apc.createEmptyProfile();
+         //sets default
+         String str = apc.getConfigApp().getProfileNameDef();
+         profileActive.setVarCharString(IBOProfileApp.PROFILE_OFFSET_08_NAME15, 15, str);
+      }
       return profileActive;
    }
 
+   /**
+    * Profile based DB name.
+    * @param dbName
+    * @return
+    */
    public String getProfiledDBName(String dbName) {
       return getProfileString() + dbName;
    }
@@ -292,6 +390,7 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
     * @return
     */
    public IntToObjects getProfiles() {
+      String storeName = getProfileStoreName();
       IntToObjects its = new IntToObjects(apc.getUCtx());
       IByteStore bs = getByteStore();
       if (bs != null) {
@@ -304,8 +403,18 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
       return its;
    }
 
+   public String getProfileStoreName() {
+      String appName = apc.getConfigApp().getAppName();
+      return appName + "_Profiles";
+   }
+
+   /**
+    * {@link IBOProfileApp#PROFILE_OFFSET_08_NAME15} 
+    * @return
+    */
    public String getProfileString() {
-      return this.getProfileActive().getVarCharString(ITechProfile.PROFILE_OFFSET_04_NAME30, 30);
+      ByteObject active = this.getProfileActive();
+      return active.getVarCharString(IBOProfileApp.PROFILE_OFFSET_08_NAME15, 15);
    }
 
    /**
@@ -319,11 +428,22 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
       return state;
    }
 
+   public String getStatorName() {
+      IConfigApp configApp = apc.getConfigApp();
+      String storeName = configApp.getAppName();
+      return storeName + getProfileString();
+   }
    /**
-    * @return {@link ITechCtxSettingsAppli}
+    * Create it if null and add {@link StatorFactoryApp}
+    * @return
     */
-   public ByteObject getTechAppli() {
-      return apc.getSettingsBO();
+   public StatorCoreData getStator() {
+      if (stator == null) {
+         String storeName = getStatorName();
+         stator = new StatorCoreData(cfc.getCoreDataCtx(), storeName);
+         stator.checkConfigErase();
+      }
+      return stator;
    }
 
    /**
@@ -344,22 +464,6 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
       return true;
    }
 
-   /**
-    * called when the app is launched first .
-    * 
-    * Returns a scenario of Activities (license agreement, install wizard, )
-    */
-   protected void subAppFirstLaunch() {
-
-   }
-
-   /**
-    * 
-    */
-   protected void subAppVersionChange() {
-
-   }
-
    public void notifyDestroyed() {
       apc.getCoordinator().appliWantBeDestroyed();
    }
@@ -376,19 +480,13 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
    }
 
    /**
-    * 
+    * Called at startup by {@link AppliAbstract#amsAppStartInside()}
     */
    protected void showCanvasDefault() {
-      CoordinatorAbstract coordinator = apc.getCoordinator();
-      StatorReaderCoreData stateReader = coordinator.getStateReader();
-      if (stateReader != null) {
-         this.stateReadFrom(stateReader);
-      }
 
-      //we have to check on the view
-      if (stateReader == null || stateReader.getStateReader(ITechStateBO.TYPE_1_VIEW).hasFlag(ITechStateBO.FLAG_1_FAILED)) {
-         //for example, license agreement based on the version of the app
-         //
+      //check if canvas id 0 is load
+
+      if (apc.getCUC().getCanvasRoot() == null) {
          //load the default canvas
          ICanvasAppli canvas = getCanvas(0, null);
          String title = apc.getConfigApp().getAppName();
@@ -406,102 +504,47 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
       apc.getCFC().getCUC().showAllCanvases();
    }
 
-   public void stateReadFrom(StatorReader state) {
+   /**
+    * Reads {@link AppliAbstract} data from state.
+    * <li> Number of canvas
+    * <li> Each {@link CanvasAppliAbstract} then reads state from the {@link Stator}
+    * 
+    * When and where is the positioning of the canvas done ?
+    * Its a {@link CanvasHostAbstract} issue.
+    */
+   public void stateOwnerRead(Stator stator) {
 
-      StatorReaderBO stator = (StatorReaderBO) state;
-
-      //is the ui state driving the model? or is the model state driving the ui state ?
-      //in single screen, ui state/model state always match
-      //apc.getCFC().stateReadAppUi((StatorReaderBO) state);
-      //
-      //once canvases have been raised from their graves
-
-      //what to put inside? a canvas appli with its state loaded
-      //only the real appli can match the serialized id to the canvas implementation
-      StatorReaderBO stateView = stator.getStateReader(ITechStateBO.TYPE_1_VIEW);
-
-      if (stateView.hasData()) {
-         stateView.addFactory(new AppStatorFactory(apc));
-         try {
-            //read the different available
-            int numCanvases = stateView.getDataReader().readInt();
-            for (int i = 0; i < numCanvases; i++) {
-               int canvasID = stateView.getDataReader().readInt();
-               ByteObject techCanvasHost = stateView.readByteObject();
-
-               //#debug
-               techCanvasHost.checkType(IBOTypesCoreUI.TYPE_5_TECH_CANVAS_HOST);
-
-               CanvasAppliAbstract canvasAppli = (CanvasAppliAbstract) getCanvas(canvasID, techCanvasHost);
-               canvasAppli.stateReadFrom(state);
-
-            }
-         } catch (Exception e) {
-            e.printStackTrace();
-            stateView.setFlag(ITechStateBO.FLAG_1_FAILED, true);
-         }
-         //check if we have at least one canvas
-         if (apc.getCUC().getRootCanvas() == null) {
-            stateView.setFlag(ITechStateBO.FLAG_1_FAILED, true);
-         }
-      } else {
-         stateView.setFlag(ITechStateBO.FLAG_1_FAILED, true);
-         //#debug
-         toDLog().pData("No View Data", stateView, AppliAbstract.class, "stateReadFrom", LVL_05_FINE, true);
-      }
-
-      //apply model data to views
-      StatorReaderBO stateModel = stator.getStateReader(ITechStateBO.TYPE_2_MODEL);
-
+      CoreAppModel model = createAppModel();
+      model.stateOwnerRead(stator);
+     
+      CoreAppView view = createAppView();
+      view.stateOwnerRead(stator);
    }
 
-   public void stateWriteTo(StatorWriter state) {
-      StatorWriterBO stator = (StatorWriterBO) state;
-      //the caller/coordinator decides the key(screen config) of this state if any 
-      //our job is to write our state. period. 
+   public void stateOwnerWrite(Stator stator) {
 
-      //asks host ui context to saves state of canvases?
-      //they may have some specific data to save
+      CoreAppModel model = createAppModel();
+      model.stateOwnerWrite(stator);
+   
 
-      //we don't want j2me to handle any such state. only state of main canvas
-      //delegate the ui host state read/write to the uictx
-      //apc.getCFC().stateWriteAppUi((StatorWriterBO) state);
-
-      //.the application is designed to not know if it has several canvas.
-      // is that possible? We have Screen/Fragment/MyGui that are displayed in a Canvas.
-      // by default, its over the other.. on j2se the user may want in a new canvas on a given screen
-      // so we have to associate "Visiblity Action", depending on the host 
-      // on a single screen, it would be as if the single canvas was divided in 2,3,4 sub areas
-      // show replace, show on top, show new screen, system provides Alt tab inside the app
-      // relation between perspective and state? 
-      // ui perspective changes how the content is displayed
-      // model perspective changes the content
-
-      //that's why the UI state is decided by the CanvasHosts. An app can decide to behave outside the
-      //paradigm described but then it has to access the CanvasHosts to learn how its own CanvasApplis
-
-      //once canvases have been raised from their graves
-
-      //the question is.. what kind of model state do we have? if its just a screen ID (maps the class name)..
-      // the app code will create blank canvas type and that's it.
-
-      StatorWriterBO stateWriterView = stator.getStateWriter(ITechStateBO.TYPE_1_VIEW);
-
-      //state write flags tell us what kind of state to persist in this batch
-
-      //what to put inside? We n
-      CanvasHostAbstract[] canvases = apc.getCFC().getCUC().getCanvases();
-      int numCanvases = canvases.length;
-      stateWriterView.getDataWriter().writeInt(numCanvases);
-      for (int i = 0; i < canvases.length; i++) {
-         canvases[i].stateWriteTo(state);
-      }
+      CoreAppView view = createAppView();
+      view.stateOwnerWrite(stator);
+      
    }
 
    /**
     * sub class of {@link AppliGeneric} can close things
     */
    protected abstract void subAppExit();
+
+   /**
+    * called when the app is launched first .
+    * 
+    * Returns a scenario of Activities (license agreement, install wizard, )
+    */
+   protected void subAppFirstLaunch() {
+
+   }
 
    /**
     * Database connection/thread/style
@@ -529,40 +572,38 @@ public abstract class AppliAbstract implements IAppli, ITechCtxSettingsAppli {
 
    }
 
+   /**
+    * 
+    */
+   protected void subAppVersionChange() {
+
+   }
+
    protected void throwExceptionBadState(String msg) {
-      throw new IllegalStateException(msg + ": bad state " + ToStringStaticFrameworkCore.toStringState(state) + "(" + state + ")");
+      throw new IllegalStateException(msg + ": bad state " + ToStringStaticCoreFramework.toStringState(state) + "(" + state + ")");
    }
 
    //#mdebug
-   public IDLog toDLog() {
-      return apc.toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
 
    public void toString(Dctx dc) {
-      dc.root(this, AppliAbstract.class);
+      dc.root(this, AppliAbstract.class, 570);
       dc.rootCtx(apc, AppCtx.class);
-      dc.appendVarWithSpace("State", ToStringStaticFrameworkCore.toStringState(state) + "(" + state + ")");
-      dc.appendVar("StartTime", startTime);
-      dc.appendVar("pauseTime", pauseTime);
-      dc.nlLvl(parent, "parentAppli");
-      dc.appendVarWithSpace("storeName", storeName);
-   }
+      dc.appendVarWithSpace("state", state);
+      dc.appendBracketedWithSpace(ToStringStaticCoreFramework.toStringState(state));
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+      dc.appendVar("startTime", startTime);
+      dc.appendVar("pauseTime", pauseTime);
+
+      dc.nlLvl(profileActive, "profileActive");
+      dc.nlLvl(stator, "stator");
+
+      dc.nlLvl(parent, "parentAppli");
    }
 
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, AppliAbstract.class);
    }
 
-   public UCtx toStringGetUCtx() {
-      return apc.getUCtx();
-   }
    //#enddebug
 
 }

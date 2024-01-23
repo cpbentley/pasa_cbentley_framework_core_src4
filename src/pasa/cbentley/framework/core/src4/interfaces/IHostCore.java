@@ -3,25 +3,26 @@ package pasa.cbentley.framework.core.src4.interfaces;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.coredraw.src4.interfaces.ITechFeaturesDraw;
-import pasa.cbentley.framework.coreui.src4.tech.ITechFeaturesUI;
+import pasa.cbentley.framework.coreui.src4.interfaces.IHostUI;
+import pasa.cbentley.framework.coreui.src4.tech.ITechHostUI;
 
 /**
- * Shortcuts to {@link ITechFeaturesHost} values.
+ * Shortcuts to {@link ITechHostCore} values.
  * <br>
  * 
- * Umbrella for {@link ITechFeaturesDraw}, {@link ITechFeaturesUI} for the underlying {@link CoreFrameworkCtx}.
+ * Umbrella for {@link ITechFeaturesDraw}, {@link ITechHostUI} for the underlying {@link CoreFrameworkCtx}.
  * 
  * @author Charles Bentley
  *
  */
-public interface IHost {
+public interface IHostCore extends IHostUI, ITechHostCore {
 
    /**
     * Enable/Disable a feature. 
     * 
-    * <li> {@link ITechFeaturesUI#SUP_ID_28_ALWAYS_ON_TOP}
+    * <li> {@link ITechHostUI#SUP_ID_28_ALWAYS_ON_TOP}
     * 
-    * <li> {@link ITechFeaturesHost#SUP_ID_20_CLIPBOARD}
+    * <li> {@link ITechHostCore#SUP_ID_20_CLIPBOARD}
     * 
     * <li> {@link ITechFeaturesDraw#SUP_ID_06_CUSTOM_FONTS}
     * <li> {@link ITechFeaturesDraw#SUP_ID_07_IMAGE_SCALING}
@@ -49,17 +50,6 @@ public interface IHost {
    public boolean enableFeatureFactory(int featureID, boolean b);
 
    /**
-    * Returns the screens configuration.
-    * <br>
-    * Type is {@link ITypesCore#TYPE_007_LIT_ARRAY_INT} with first value being number of screesn
-    * 
-    * and then x,y,w,h couples for each screens.
-    * <Br>
-    * @return
-    */
-   public ByteObject getScreenConfig();
-
-   /**
     * 
     * @param dataID
     * @return
@@ -69,8 +59,8 @@ public interface IHost {
    /**
     * Returns a configuration value from host framework context.
     * 
-    * <li> {@link ITechFeaturesHost#DATA_ID_11_FLING_SPEED_MAX}
-    * <li> {@link ITechFeaturesHost#DATA_ID_12_FLING_SPEED_MIN}
+    * <li> {@link ITechHostCore#DATA_ID_11_FLING_SPEED_MAX}
+    * <li> {@link ITechHostCore#DATA_ID_12_FLING_SPEED_MIN}
     * 
     * @param dataID
     * @return
@@ -79,7 +69,7 @@ public interface IHost {
 
    /**
     * Object class is defined by 
-    * <li> {@link ITechFeaturesHost#DATA_ID_OBJ_01_SCREENS}
+    * <li> {@link ITechHostCore#DATA_ID_OBJ_01_SCREENS}
     * @param dataID
     * @return
     */
@@ -94,15 +84,15 @@ public interface IHost {
    public String getHostString(int dataID);
 
    /**
-    * {@link ITechHost}
+    * {@link IBOHost}
     * @return
     */
    public ByteObject getTechHost();
 
    /**
     * Query Host for support of features
-    * <li> {@link ITechFeaturesHost#SUP_ID_02_POINTERS}
-    * <li> {@link ITechFeaturesHost#SUP_ID_03_OPEN_GL}
+    * <li> {@link ITechHostCore#SUP_ID_02_POINTERS}
+    * <li> {@link ITechHostCore#SUP_ID_03_OPEN_GL}
     * <br>
     * <br>
     * 
@@ -114,8 +104,7 @@ public interface IHost {
    /**
     * Return true when the feature is currently active/enabled.
     * 
-    * <li> {@link ITechFeaturesHost#SUP_04_WHEEL_EVENTS}
-    * <li> {@link ITechFeaturesHost#SUP_ID_04_ALIAS}
+    * <li> {@link ITechHostCore#SUP_ID_15_BLUETOOTH}
     * @param featureID
     * @return
     */

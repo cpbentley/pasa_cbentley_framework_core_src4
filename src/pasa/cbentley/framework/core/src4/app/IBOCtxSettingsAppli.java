@@ -1,13 +1,13 @@
 package pasa.cbentley.framework.core.src4.app;
 
 import pasa.cbentley.byteobjects.src4.core.interfaces.IBOCtxSettings;
-import pasa.cbentley.framework.core.src4.interfaces.ITechHost;
+import pasa.cbentley.framework.core.src4.interfaces.IBOHost;
 
 /**
  * Settings of an {@link IAppli}.
  * <br>
  * <br>
- * {@link ITechCtxSettingsAppli} business object is profile dependant
+ * {@link IBOCtxSettingsAppli} business object is profile dependant
  * <br>
  * <br>
  * Each profile has one or several application settings.
@@ -26,7 +26,7 @@ import pasa.cbentley.framework.core.src4.interfaces.ITechHost;
  * @author Charles-Philip Bentley
  *
  */
-public interface ITechCtxSettingsAppli extends IBOCtxSettings {
+public interface IBOCtxSettingsAppli extends IBOCtxSettings {
 
    public static final int CTX_APP_ALIAS_0_BEST                 = 0;
 
@@ -78,14 +78,14 @@ public interface ITechCtxSettingsAppli extends IBOCtxSettings {
 
    /**
     * User Request for Mode for anti aliasing in graphics
-    * <li> {@link ITechCtxSettingsAppli#CTX_APP_ALIAS_0_BEST} is best decision
-    * <li> {@link ITechCtxSettingsAppli#CTX_APP_ALIAS_1_ON} is on
-    * <li> {@link ITechCtxSettingsAppli#CTX_APP_ALIAS_2_OFF} is off
+    * <li> {@link IBOCtxSettingsAppli#CTX_APP_ALIAS_0_BEST} is best decision
+    * <li> {@link IBOCtxSettingsAppli#CTX_APP_ALIAS_1_ON} is on
+    * <li> {@link IBOCtxSettingsAppli#CTX_APP_ALIAS_2_OFF} is off
     * <br>
     * Appli settings for default anti alias. When request was successful ....
-    * see {@link ITechHost#HOST_FLAGX_1_ANTI_ALIAS}
+    * see {@link IBOHost#HOST_FLAGX_1_ANTI_ALIAS}
     * and
-    * {@link ITechHost#HOST_FLAGX_2_ANTI_ALIAS_USER}
+    * {@link IBOHost#HOST_FLAGX_2_ANTI_ALIAS_USER}
     */
    public static final int CTX_APP_OFFSET_08_ANTI_ALIAS1        = CTX_BASIC_SIZE + 15;
 

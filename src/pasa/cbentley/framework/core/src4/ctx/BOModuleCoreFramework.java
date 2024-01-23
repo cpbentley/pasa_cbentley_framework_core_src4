@@ -6,7 +6,7 @@ import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.framework.core.src4.app.ITechCtxSettingsAppli;
+import pasa.cbentley.framework.core.src4.app.IBOCtxSettingsAppli;
 
 public class BOModuleCoreFramework extends BOModuleAbstract {
 
@@ -43,21 +43,21 @@ public class BOModuleCoreFramework extends BOModuleAbstract {
          case IBOTypesBOC.TYPE_012_CTX_SETTINGS:
             if (subType == ITechCtxSettingsCoreFramework.CTX_COREFW_TYPE_SUB) {
                dc.rootN(bo, "ITechCtxSettingsCoreFramework");
-            } else if (subType == ITechCtxSettingsAppli.CTX_APP_TYPE_SUB) {
+            } else if (subType == IBOCtxSettingsAppli.CTX_APP_TYPE_SUB) {
                dc.rootN(bo, "ITechCtxSettingsAppli");
-               int appStarts = bo.get2(ITechCtxSettingsAppli.CTX_APP_OFFSET_04_STARTS2);
+               int appStarts = bo.get2(IBOCtxSettingsAppli.CTX_APP_OFFSET_04_STARTS2);
                dc.appendVarWithSpace("appStarts", appStarts);
 
-               int runningTime = bo.get4(ITechCtxSettingsAppli.CTX_APP_OFFSET_05_RUNNING_TIME4);
+               int runningTime = bo.get4(IBOCtxSettingsAppli.CTX_APP_OFFSET_05_RUNNING_TIME4);
                dc.appendVarWithSpace("runningTime", runningTime);
 
-               boolean isHeadLess = bo.hasFlag(ITechCtxSettingsAppli.CTX_APP_OFFSET_01_FLAG, ITechCtxSettingsAppli.CTX_APP_FLAG_1_HEADLESS);
+               boolean isHeadLess = bo.hasFlag(IBOCtxSettingsAppli.CTX_APP_OFFSET_01_FLAG, IBOCtxSettingsAppli.CTX_APP_FLAG_1_HEADLESS);
                dc.appendVarWithSpace("isHeadLess", isHeadLess);
 
-               boolean isDragDrop = bo.hasFlag(ITechCtxSettingsAppli.CTX_APP_OFFSET_02_FLAGX, ITechCtxSettingsAppli.CTX_APP_FLAGX_2_DRAG_DROP);
+               boolean isDragDrop = bo.hasFlag(IBOCtxSettingsAppli.CTX_APP_OFFSET_02_FLAGX, IBOCtxSettingsAppli.CTX_APP_FLAGX_2_DRAG_DROP);
                dc.appendVarWithSpace("isDragDrop", isDragDrop);
                
-               boolean isOneThumb = bo.hasFlag(ITechCtxSettingsAppli.CTX_APP_OFFSET_02_FLAGX, ITechCtxSettingsAppli.CTX_APP_FLAGX_8_ONE_THUMB);
+               boolean isOneThumb = bo.hasFlag(IBOCtxSettingsAppli.CTX_APP_OFFSET_02_FLAGX, IBOCtxSettingsAppli.CTX_APP_FLAGX_8_ONE_THUMB);
                dc.appendVarWithSpace("isOneThumb", isOneThumb);
 
             }

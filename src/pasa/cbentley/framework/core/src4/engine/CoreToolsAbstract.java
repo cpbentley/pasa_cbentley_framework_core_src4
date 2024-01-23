@@ -1,9 +1,9 @@
 package pasa.cbentley.framework.core.src4.engine;
 
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
-import pasa.cbentley.framework.core.src4.interfaces.IHostUITools;
+import pasa.cbentley.framework.core.src4.interfaces.IHostCoreTools;
 
-public abstract class CoreToolsAbstract implements IHostUITools {
+public abstract class CoreToolsAbstract implements IHostCoreTools {
 
    protected final CoreFrameworkCtx cfc;
 

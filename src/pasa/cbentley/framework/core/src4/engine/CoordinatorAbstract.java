@@ -1,38 +1,45 @@
 package pasa.cbentley.framework.core.src4.engine;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.stator.ITechStateBO;
-import pasa.cbentley.byteobjects.src4.stator.StatorWriterBO;
 import pasa.cbentley.core.src4.ctx.IEventsCore;
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
+import pasa.cbentley.core.src4.stator.IStatorFactory;
+import pasa.cbentley.core.src4.stator.Stator;
 import pasa.cbentley.core.src4.stator.StatorReader;
+import pasa.cbentley.framework.core.src4.app.AppliAbstract;
 import pasa.cbentley.framework.core.src4.app.IAppli;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
+import pasa.cbentley.framework.core.src4.ctx.ObjectCFC;
 import pasa.cbentley.framework.core.src4.interfaces.ILauncherAppli;
 import pasa.cbentley.framework.core.src4.interfaces.ILauncherHost;
-import pasa.cbentley.framework.coredata.src4.engine.StatorReaderCoreData;
-import pasa.cbentley.framework.coredata.src4.engine.StatorWriterCoreData;
+import pasa.cbentley.framework.coredata.src4.stator.StatorCoreData;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
 
 /**
  * 
  * Coordinate the life cycle the {@link IAppli} to the {@link ILauncherHost}.
  * 
+ * <p>
+ * 
  * The {@link CoordinatorAbstract} implementation is the appendice of the {@link ILauncherHost}
  * 
  * One to zero/one relation between {@link CoordinatorAbstract} and {@link IAppli}
+ * </p>
  * 
  * <li> Start them in the correct order
  * <li> The coordinator is used by the host canvas to interact stop/pause/start the application.
+ * 
+ * <p>
  * 
  * The Host is created before the application instance.
  * 
  * Because Android/J2ME launchers must extend a specific classes, we cannot have multiple inheritance
  * 
  * This class is that second head to the launcher. Its the primary API used by the Bentley framework.
+ * </p>
+ * 
+ * <p>
  * 
  * {@link ILauncherHost} being more close to the metal and the host implementation.
  * 
@@ -42,23 +49,22 @@ import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
  * The {@link CoordinatorAbstract} starts the appli with a {@link ILauncherAppli}
  * 
  * For other stuff, see {@link CoreFrameworkCtx}
+ * </p>
  * 
  * @author Charles Bentley
  *
  */
-public abstract class CoordinatorAbstract implements IStringable {
+public abstract class CoordinatorAbstract extends ObjectCFC implements IStringable {
 
-   protected IAppli               app;
+   protected IAppli         app;
 
-   protected CoreFrameworkCtx     cfc;
+   protected ILauncherAppli launcherAppli;
 
-   protected ILauncherAppli       launcherAppli;
+   protected ILauncherHost  launcherHost;
 
-   protected ILauncherHost        launcherHost;
+   protected IAppli         parent;
 
-   protected IAppli               parent;
-
-   protected StatorReaderCoreData stateReader;
+   private boolean          toStringIsFullDebug;
 
    /**
     * The coordinator created needs an {@link ILauncherHost}
@@ -69,13 +75,10 @@ public abstract class CoordinatorAbstract implements IStringable {
     * @param launcherHost
     */
    protected CoordinatorAbstract(CoreFrameworkCtx cfc, ILauncherHost launcherHost) {
-      this.cfc = cfc;
+      super(cfc);
       this.launcherHost = launcherHost;
    }
 
-   public StatorReaderCoreData getStateReader() {
-      return stateReader;
-   }
 
    /**
     * {@link IAppli} notifies the {@link CoordinatorAbstract} that it has entered exit state on its own decision.
@@ -87,6 +90,9 @@ public abstract class CoordinatorAbstract implements IStringable {
     * If parent appli, return result to parent TODO
     */
    public void appliWantBeDestroyed() {
+      //#debug
+      toDLog().pFlow("", this, CoordinatorAbstract.class, "appliWantBeDestroyed", LVL_05_FINE, true);
+
       subExit();
       //notify parent that we closed. if stand alone. exit
       if (parent != null) {
@@ -103,28 +109,16 @@ public abstract class CoordinatorAbstract implements IStringable {
       subPause();
    }
 
-   private StatorWriterCoreData stateWriter;
-
-   private boolean              toStringIsFullDebug;
-
    /**
     * 
     */
    public void frameworkExit() {
+      //Ctx Manager Debug gives the whole tree of the application at the time of the exit
       //#debug
-      toDLog().pBridge("", this, CoordinatorAbstract.class, "frameworkExit");
-
-      StatorWriterBO stateWriterCtx = getStateWriter().getStateWriter(ITechStateBO.TYPE_3_CTX);
-      cfc.getUCtx().getCtxManager().stateWriteTo(stateWriterCtx);
-
-      //modules outside the app have static settings. This is now all those objects are saved
+      toDLog().pFlow("", getCFC().getUCtx().getCtxManager(), CoordinatorAbstract.class, "frameworkExit");
 
       // first send exit hooks to the application
       if (app != null) {
-
-         //first ask to write state
-         app.stateWriteTo(stateWriter);
-
          //close the appmodule
          //unconditionally close the application
          app.amsAppExit();
@@ -139,28 +133,9 @@ public abstract class CoordinatorAbstract implements IStringable {
 
       LifeContext context = new LifeContext();
       cfc.lifeStopped(context);
-      
-      //serialize
-
-      stateWriter.serialize();
 
       //host knows how to clean exit app, depending on wrapper context
       launcherHost.appExit();
-   }
-
-   public StatorWriterCoreData getStateWriter() {
-      if (stateWriter == null) {
-         String storeName = app.getAppCtx().getConfigApp().getAppName();
-         stateWriter = new StatorWriterCoreData(cfc.getCoreDataCtx(), storeName);
-      }
-      return stateWriter;
-   }
-
-   /**
-    * @param boState
-    */
-   public void stateReadFrom(StatorReader state) {
-      cfc.getUCtx().getCtxManager().stateReadFrom(state);
    }
 
    public void frameworkPause() {
@@ -202,12 +177,24 @@ public abstract class CoordinatorAbstract implements IStringable {
    }
 
    /**
-    * Ask the host to run the start in its specific thread format.
-    * 
-    * Will call {@link CoordinatorAbstract#initUIThreadInside()} inside the ui thread or this thread
-    * if host knows this is already the UI thread
+    * Null if framework was not started
+    * @return
     */
-   protected abstract void startUIThread();
+   public IAppli getAppli() {
+      return app;
+   }
+
+   public CoreFrameworkCtx getCFC() {
+      return cfc;
+   }
+
+   public ILauncherAppli getLauncherAppli() {
+      return launcherAppli;
+   }
+
+   public ILauncherHost getLauncherHost() {
+      return launcherHost;
+   }
 
    /**
     * Called by implementation inside its ui thread
@@ -240,40 +227,8 @@ public abstract class CoordinatorAbstract implements IStringable {
       }
    }
 
-   public void toStringEnableFullDebug() {
-      toStringIsFullDebug = true;
-   }
-
-   /**
-    * Null if framework was not started
-    * @return
-    */
-   public IAppli getAppli() {
-      return app;
-   }
-
-   public CoreFrameworkCtx getCFC() {
-      return cfc;
-   }
-
-   public ILauncherAppli getLauncherAppli() {
-      return launcherAppli;
-   }
-
-   public ILauncherHost getLauncherHost() {
-      return launcherHost;
-   }
-
    public boolean isLoaded() {
       return app != null;
-   }
-
-   /**
-    * Set by the creator of {@link CoordinatorAbstract}, the {@link ILauncherHost}
-    * @param stateReader
-    */
-   public void setStateReader(StatorReaderCoreData stateReader) {
-      this.stateReader = stateReader;
    }
 
    /**
@@ -298,21 +253,21 @@ public abstract class CoordinatorAbstract implements IStringable {
       this.launcherAppli = launcherAppli;
    }
 
+   /**
+    * Ask the host to run the start in its specific thread format.
+    * 
+    * Will call {@link CoordinatorAbstract#initUIThreadInside()} inside the ui thread or this thread
+    * if host knows this is already the UI thread
+    */
+   protected abstract void startUIThread();
+
    protected abstract void subExit();
 
    protected abstract void subPause();
 
    protected abstract void subResume();
 
-   public IDLog toDLog() {
-      return cfc.toDLog();
-   }
-
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
       dc.root(this, CoordinatorAbstract.class, "@line299");
       dc.rootCtx(cfc, CoreFrameworkCtx.class);
@@ -321,12 +276,6 @@ public abstract class CoordinatorAbstract implements IStringable {
       dc.nlLvl(parent, "parent IAppli");
       dc.nlLvl(launcherAppli, "launcherAppli");
       dc.nlLvl(launcherHost, "launcherHost");
-      dc.nlLvl(stateReader, "stateReader");
-      dc.nlLvl(stateWriter, "stateWriter");
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
    }
 
    public void toString1Line(Dctx dc) {
@@ -334,8 +283,8 @@ public abstract class CoordinatorAbstract implements IStringable {
       toStringPrivate(dc);
    }
 
-   public UCtx toStringGetUCtx() {
-      return cfc.getUCtx();
+   public void toStringEnableFullDebug() {
+      toStringIsFullDebug = true;
    }
 
    private void toStringPrivate(Dctx dc) {

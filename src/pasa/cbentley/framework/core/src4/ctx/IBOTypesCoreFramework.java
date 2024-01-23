@@ -1,7 +1,11 @@
 package pasa.cbentley.framework.core.src4.ctx;
 
-public interface IBOTypesCoreFramework {
+import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 
-   int FTYPE_2_HOST = 2;
+public interface IBOTypesCoreFramework extends IBOTypesBOC {
+
+   public static final int FTYPE_2_HOST    = 2;
+
+   public static final int FTYPE_3_PROFILE = 3;
 
 }
