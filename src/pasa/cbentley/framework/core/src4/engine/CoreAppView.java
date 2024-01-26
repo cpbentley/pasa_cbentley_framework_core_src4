@@ -36,15 +36,16 @@ import pasa.cbentley.framework.coreui.src4.tech.IBOFramePos;
  */
 public class CoreAppView extends ObjectCFC implements IStatorOwner {
 
-  
    public CoreAppView(CoreFrameworkCtx cfc) {
       super(cfc);
    }
 
-
-
    public void stateOwnerRead(Stator stator) {
       StatorReaderBO state = (StatorReaderBO) stator.getReader(ITechStatorBO.TYPE_1_VIEW);
+
+      if (state == null) {
+         return;
+      }
 
       //save stuff here when u add some
       stateOwnerCanvasHostsReading(state);
@@ -64,23 +65,28 @@ public class CoreAppView extends ObjectCFC implements IStatorOwner {
          //read the different available
          int numCanvases = statorReader.readInt();
          for (int i = 0; i < numCanvases; i++) {
-            int canvasID = statorReader.readInt();
-            ByteObject techCanvasHost = statorReader.readByteObject();
+
+            //int canvasID = statorReader.readInt();
+            //ByteObject techCanvasHost = statorReader.readByteObject();
+            //            //#debug
+            //            techCanvasHost.checkType(IBOTypesCoreUI.TYPE_5_TECH_CANVAS_HOST);
+
+            statorReader.checkInt(123456);
+            CanvasAppliAbstract canvasAppli = (CanvasAppliAbstract) statorReader.readObject();
 
             //#debug
-            techCanvasHost.checkType(IBOTypesCoreUI.TYPE_5_TECH_CANVAS_HOST);
-
-            CanvasAppliAbstract canvasAppli = (CanvasAppliAbstract) appli.getCanvas(canvasID, techCanvasHost);
-
-            statorReader.readerToStatorable(canvasAppli);
+            toDLog().pInit("UnWrapped", canvasAppli, CoreAppView.class, "stateOwnerCanvasHostsReading", LVL_05_FINE, true);
+            //statorReader.readerToStatorable(canvasAppli);
 
          }
       } catch (Exception e) {
+         //#debug
+         toDLog().pEx("", this, CoreAppView.class, "stateOwnerCanvasHostsReading", e);
          e.printStackTrace();
          statorReader.setFlag(ITechStatorBO.FLAG_1_FAILED, true);
       }
       //check if we have at least one canvas
-      if (cfc.getCUC().getRootCanvas() == null) {
+      if (cfc.getCUC().getCanvasRootHost() == null) {
          statorReader.setFlag(ITechStatorBO.FLAG_1_FAILED, true);
       }
 
@@ -96,13 +102,15 @@ public class CoreAppView extends ObjectCFC implements IStatorOwner {
          for (int i = 0; i < numCanvases; i++) {
             CanvasHostAbstract ch = canvases[i];
 
-            int id = ch.getCanvasID();
-            statorWriter.getWriter().writeInt(id);
+            //            int id = ch.getCanvasID();
+            //            statorWriter.getWriter().writeInt(id);
+            //            ByteObject boCanvas = ch.getBOCanvasHost();
+            //            boCanvas.checkType(IBOTypesCoreUI.TYPE_5_TECH_CANVAS_HOST);
+            //            statorWriter.writeByteObject(boCanvas);
 
-            ByteObject boCanvas = ch.getBOCanvasHost();
-            statorWriter.writeByteObject(boCanvas);
-
-            statorWriter.writerToStatorable(ch);
+            statorWriter.getWriter().writeInt(123456);
+            ICanvasAppli canvasAppli = ch.getCanvasAppli();
+            statorWriter.writerToStatorable(canvasAppli);
          }
       } catch (Exception e) {
          e.printStackTrace();
@@ -117,7 +125,7 @@ public class CoreAppView extends ObjectCFC implements IStatorOwner {
 
       //save stuff here when u add some
       stateOwnerCanvasHostsWriting(w);
-      
+
       stateWriteToSub(w);
    }
 
@@ -128,10 +136,6 @@ public class CoreAppView extends ObjectCFC implements IStatorOwner {
    protected void stateWriteToSub(StatorWriter state) {
 
    }
-
- 
-
-
 
    //#mdebug
    public void toString(Dctx dc) {

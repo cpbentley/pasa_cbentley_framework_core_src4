@@ -3,13 +3,32 @@ package pasa.cbentley.framework.core.src4.engine;
 import pasa.cbentley.core.src4.ctx.ObjectU;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.framework.core.src4.app.IConfigApp;
+import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.src4.interfaces.ILauncherAppli;
 
+/**
+ * Simple encapulsates an {@link IConfigApp} and the method for creating the Appli
+ * 
+ * <li> {@link ILauncherAppli#createAppOnFramework(CoreFrameworkCtx)}
+ * @author Charles Bentley
+ *
+ */
 public abstract class LauncherAppliAbstract extends ObjectU implements ILauncherAppli {
 
+   protected final IConfigApp configApp;
 
    public LauncherAppliAbstract(UCtx uc) {
+      this(null,uc);
+   }
+   
+   public LauncherAppliAbstract(IConfigApp configApp, UCtx uc) {
       super(uc);
+      this.configApp = configApp;
+   }
+
+   public IConfigApp getConfigApp() {
+      return configApp;
    }
 
    //#mdebug
@@ -20,7 +39,7 @@ public abstract class LauncherAppliAbstract extends ObjectU implements ILauncher
    }
 
    private void toStringPrivate(Dctx dc) {
-      
+
    }
 
    public void toString1Line(Dctx dc) {
@@ -30,7 +49,5 @@ public abstract class LauncherAppliAbstract extends ObjectU implements ILauncher
    }
 
    //#enddebug
-   
-
 
 }

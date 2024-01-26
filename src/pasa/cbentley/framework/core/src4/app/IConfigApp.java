@@ -51,6 +51,10 @@ public interface IConfigApp extends IConfigBO {
     */
    public boolean isAppDragDropEnabled();
 
+   /**
+    * 
+    * @return
+    */
    public String getProfileNameDef();
 
 }

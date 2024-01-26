@@ -1,19 +1,13 @@
 package pasa.cbentley.framework.core.src4.engine;
 
-import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.ctx.IEventsCore;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
-import pasa.cbentley.core.src4.stator.IStatorFactory;
-import pasa.cbentley.core.src4.stator.Stator;
-import pasa.cbentley.core.src4.stator.StatorReader;
-import pasa.cbentley.framework.core.src4.app.AppliAbstract;
 import pasa.cbentley.framework.core.src4.app.IAppli;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.src4.ctx.ObjectCFC;
 import pasa.cbentley.framework.core.src4.interfaces.ILauncherAppli;
 import pasa.cbentley.framework.core.src4.interfaces.ILauncherHost;
-import pasa.cbentley.framework.coredata.src4.stator.StatorCoreData;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
 
 /**
@@ -79,7 +73,6 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
       this.launcherHost = launcherHost;
    }
 
-
    /**
     * {@link IAppli} notifies the {@link CoordinatorAbstract} that it has entered exit state on its own decision.
     * 
@@ -131,6 +124,7 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
       //then send exit hooks to the Manager subclass. this enable them to close VLC instances
       subExit(); //TODO send exit hooks to module that use VLC 
 
+      cfc.getCUC().onExit();
       LifeContext context = new LifeContext();
       cfc.lifeStopped(context);
 
@@ -158,6 +152,7 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
          app.amsAppStart();
       }
       subResume();
+      launcherHost.appPause();
    }
 
    /**
@@ -197,9 +192,18 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
    }
 
    /**
+    * We want a testCase to be able to read this
+    */
+   private volatile boolean hasStartedInitUI = false;
+
+   /**
     * Called by implementation inside its ui thread
     */
    protected void initUIThreadInside() {
+      //#debug
+      toDLog().pTest("msg", this, CoordinatorAbstract.class, "run", LVL_05_FINE, true);
+
+      hasStartedInitUI = true;
       //normal an app should create a canvas
       app = launcherAppli.createAppOnFramework(cfc); //launcher creates the app
 
@@ -210,7 +214,10 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
       //state cannot be loaded here. we have to check for app version before on the core app state
       app.amsAppStart();
 
-      if (cfc.getCUC().getRootCanvas() == null) {
+      //#debug
+      toDLog().pFlow("msg", this, CoordinatorAbstract.class, "initUIThreadInside", LVL_05_FINE, true);
+
+      if (cfc.getCUC().getCanvasRootHost() == null) {
          //headless mode no canvas
       }
 
@@ -235,14 +242,13 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
     * Implementation takes the current screen configuration and loads the {@link ICanvasAppli}s of the App with the saved tech and positions.
     * <br>
     * 
-    * launch default with {@link IAppli#getCanvas(int, ByteObject)}
     * <li> When implementation does not support multi screen, 
     * <li> When no state is present
     * 
     * 
     * @returns false, if last state could not be found.
     */
-   public abstract boolean loadLastState();
+   protected abstract boolean subLoadLastState();
 
    /**
     * If an apps already runs, destroys it.
@@ -289,6 +295,10 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
 
    private void toStringPrivate(Dctx dc) {
 
+   }
+
+   public boolean isHasStartedInitUI() {
+      return hasStartedInitUI;
    }
 
    //#enddebug

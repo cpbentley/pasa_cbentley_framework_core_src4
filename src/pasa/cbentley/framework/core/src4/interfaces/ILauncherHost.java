@@ -2,15 +2,17 @@ package pasa.cbentley.framework.core.src4.interfaces;
 
 import pasa.cbentley.core.src4.ctx.ACtx;
 import pasa.cbentley.core.src4.ctx.CtxManager;
+import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.ILogConfigurator;
 import pasa.cbentley.core.src4.logging.IStringable;
+import pasa.cbentley.framework.core.src4.app.AppCtx;
 import pasa.cbentley.framework.core.src4.app.IAppli;
 import pasa.cbentley.framework.core.src4.app.IConfigApp;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.src4.engine.CoordinatorAbstract;
 import pasa.cbentley.framework.coredata.src4.stator.StatorCoreData;
-import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasOwner;
+import pasa.cbentley.framework.coreui.src4.interfaces.IWrapperManager;
 
 /**
  * The {@link ILauncherHost} is the first object to be instantiated.
@@ -18,14 +20,14 @@ import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasOwner;
  * <li> J2ME : it is a Midlet
  * <li> Android : it is an Activity
  * <li> J2SE Swing: it is nothing. There is no special requirement to run a J2SE app. A JFrame though.
- * 
+ * <li> JUnit Test: It is nothing. One class is designed to implement the methods
  * <br>
  * <br>
  * As soon as possible, it loads the previous state, including ctx settings into the {@link CtxManager}
  * <br>
  * It creates all the {@link ACtx} required by the underlying platform (Swing,Android).
  * <br>
- * The {@link ILauncherHost} knows what kind of GUI is possible. To manage those possibilities, an {@link ICanvasOwner}
+ * The {@link ILauncherHost} knows what kind of GUI is possible. To manage those possibilities, an {@link IWrapperManager}
  * is created by the {@link ILauncherHost} along with the host {@link CoordinatorAbstract}.
  * <br>
  * A Swing application using a Bentley Framework Application will uses a launcher that fits the context within which
@@ -34,6 +36,14 @@ import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasOwner;
  */
 public interface ILauncherHost extends IStringable {
 
+   /**
+    * Create the {@link IConfigApp} for the {@link AppCtx} that is created by 
+    * 
+    * {@link ILauncherHost#startAppli(ILauncherAppli)}
+    * 
+    * @param uc
+    * @return {@link IConfigApp}
+    */
    public IConfigApp createConfigApp(UCtx uc);
 
    /**
@@ -47,10 +57,18 @@ public interface ILauncherHost extends IStringable {
     */
    public CoordinatorAbstract getCoordinator();
 
+   /**
+    * Specific {@link IDependencies} for the {@link ILauncherAppli}. 
+    * 
+    * Example
+    * <li> A Sound Ctx for generating sounds 
+    * <li> String Producer
+    * <li> OpenGL context.
+    * 
+    * @return
+    */
    public IDependencies getDependencies();
 
-   public void addStatorFactories(StatorCoreData stator);
-      
    /**
     * Assigns the {@link ILauncherAppli} and creates the {@link IAppli} with the {@link ILauncherAppli#createAppOnFramework(CoreFrameworkCtx)}.
     * 
@@ -87,6 +105,10 @@ public interface ILauncherHost extends IStringable {
     */
    public void setOSSpecifics(CoreFrameworkCtx hoc);
 
+   /**
+    * Owner {@link ICtx} of the {@link ILauncherHost}.
+    * @return
+    */
    public CoreFrameworkCtx getCFC();
 
    //#mdebug

@@ -21,10 +21,12 @@ import pasa.cbentley.framework.core.src4.engine.CoreAppView;
 import pasa.cbentley.framework.coredata.src4.db.IByteStore;
 import pasa.cbentley.framework.coredata.src4.stator.StatorCoreData;
 import pasa.cbentley.framework.coredata.src4.stator.StatorReaderCoreData;
+import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.coreui.src4.engine.CanvasAppliAbstract;
 import pasa.cbentley.framework.coreui.src4.engine.CanvasHostAbstract;
 import pasa.cbentley.framework.coreui.src4.event.BEvent;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
+import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasHost;
 
 /**
  * Base implementation of {@link IAppli}.
@@ -117,13 +119,13 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       if (state != STATE_0_CREATED) {
          throwExceptionBadState("Pause");
       }
-
+      amsAppLoadStator();
       subAppLoad();
       state = STATE_1_LOADED;
    }
 
    /**
-    * 
+    * Inverse of {@link AppliAbstract#amsAppExitWriteStator()}
     */
    protected void amsAppLoadStator() {
       StatorCoreData stator = getStator();
@@ -230,14 +232,6 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
          //called before installation
          subAppFirstLaunch();
 
-         // call the installation routine of the application
-         boolean isInstalled = install();
-         if (!isInstalled) {
-            //do something about it
-
-         }
-         //launch the first time wizard ? License agreement?
-
          String versionOfState = coreStateApp.getVarCharString(CTX_APP_OFFSET_12_VARCHAR_VERSION10, 2);
          String versionOfCode = apc.getVersion();
          if (!versionOfCode.equals(versionOfState)) {
@@ -302,7 +296,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
     */
    public void eventPublish(BEvent ge) {
       //TODO main event bridge. not linked to canvas?
-      apc.getCFC().getCUC().getRootCanvas().eventBridge(ge);
+      apc.getCFC().getCUC().getCanvasRootHost().eventBridge(ge);
    }
 
    public IAppli getApp() {
@@ -318,19 +312,49 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       return bs;
    }
 
-   public abstract ICanvasAppli getCanvas(int id, ByteObject tech);
+   public abstract ICanvasAppli createCanvas(int id, ByteObject boCanvasHost, Object params);
+   
 
+   public ICanvasAppli getCanvas(int id) {
+      ICanvasHost ch = apc.getCUC().getCanvasFromID(id);
+      if (ch != null) {
+         return ch.getCanvasAppli();
+      }
+      return null;
+   }
+
+   public CoreUiCtx getCUC() {
+      return apc.getCUC();
+   }
    /**
-    * Return the active (shown) canvas for the Application
+    * Return the active (shown) canvas for the Application.
+    * 
     * @return never null. zero length is none
     */
-   public ICanvasAppli[] getCanvasActive() {
+   public ICanvasAppli[] getCanvasAll() {
       CanvasHostAbstract[] canvases = apc.getCUC().getCanvasesShown();
       ICanvasAppli[] appc = new ICanvasAppli[canvases.length];
       for (int i = 0; i < canvases.length; i++) {
          appc[i] = canvases[i].getCanvasAppli();
       }
       return appc;
+   }
+
+   /**
+    * 
+    * @return
+    */
+   public ICanvasHost[] getCanvasHostAll() {
+      CanvasHostAbstract[] canvases = apc.getCUC().getCanvases();
+      return canvases;
+   }
+
+   public ICanvasAppli getCanvasRoot() {
+      CanvasHostAbstract canvasRoot = apc.getCUC().getCanvasRootHost();
+      if (canvasRoot != null) {
+         return canvasRoot.getCanvasAppli();
+      }
+      return null;
    }
 
    public ICtx getCtxOwner() {
@@ -409,6 +433,15 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    }
 
    /**
+    * {@link IBOCtxSettingsAppli#CTX_APP_OFFSET_04_STARTS2}
+    * @return
+    */
+   public int getBONumStarts() {
+      ByteObject bo = getCtxSettingsAppli();
+      return bo.get2(IBOCtxSettingsAppli.CTX_APP_OFFSET_04_STARTS2);
+   }
+
+   /**
     * {@link IBOProfileApp#PROFILE_OFFSET_08_NAME15} 
     * @return
     */
@@ -433,6 +466,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       String storeName = configApp.getAppName();
       return storeName + getProfileString();
    }
+
    /**
     * Create it if null and add {@link StatorFactoryApp}
     * @return
@@ -442,18 +476,19 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
          String storeName = getStatorName();
          stator = new StatorCoreData(cfc.getCoreDataCtx(), storeName);
          stator.checkConfigErase();
+         stator.importFromStore();
       }
       return stator;
    }
 
-   /**
-    * Implements to install first stuff
-    * 
-    * @return true when installation was successful.
-    */
-   public boolean install() {
 
-      return true;
+   /**
+    * Delete exsiting settings data on disk 
+    */
+   public void deleteStatorData() {
+      getStator().deleteDataAll();
+      stator = null;
+      apc.getUC().getCtxManager().deleteStartData();
    }
 
    /**
@@ -486,9 +521,11 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
 
       //check if canvas id 0 is load
 
-      if (apc.getCUC().getCanvasRoot() == null) {
+      CoreUiCtx cuc = apc.getCUC();
+
+      if (this.getCanvasRoot() == null) {
          //load the default canvas
-         ICanvasAppli canvas = getCanvas(0, null);
+         ICanvasAppli canvas = createCanvas(0, null, null);
          String title = apc.getConfigApp().getAppName();
          canvas.setTitle(title);
          String icon = apc.getConfigApp().getAppIcon();
@@ -501,7 +538,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       }
 
       //show the canvases, either from state or from new
-      apc.getCFC().getCUC().showAllCanvases();
+      cuc.showAllCanvases();
    }
 
    /**
@@ -516,7 +553,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
 
       CoreAppModel model = createAppModel();
       model.stateOwnerRead(stator);
-     
+
       CoreAppView view = createAppView();
       view.stateOwnerRead(stator);
    }
@@ -525,11 +562,10 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
 
       CoreAppModel model = createAppModel();
       model.stateOwnerWrite(stator);
-   
 
       CoreAppView view = createAppView();
       view.stateOwnerWrite(stator);
-      
+
    }
 
    /**

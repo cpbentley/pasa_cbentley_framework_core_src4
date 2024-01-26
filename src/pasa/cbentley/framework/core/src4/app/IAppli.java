@@ -5,10 +5,13 @@ import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.stator.IStatorable;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.src4.engine.CoordinatorAbstract;
+import pasa.cbentley.framework.core.src4.engine.CoreAppView;
 import pasa.cbentley.framework.core.src4.interfaces.IBOHost;
+import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.coreui.src4.engine.CanvasAppliAbstract;
 import pasa.cbentley.framework.coreui.src4.engine.CanvasHostAbstract;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
+import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasHost;
 import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
 
 /**
@@ -49,6 +52,11 @@ public interface IAppli extends ITechAppli, IStringable {
    /**
     * Application Management Software (AMS) calls this method to start the app for the user.
     * When called 
+    * 
+    * <p>
+    * Shouldn't this creates the root Canvas anyways ?
+    * </p>
+    * 
     * <li> {@link ITechAppli#STATE_3_PAUSED} calls resumes 
     * <li> {@link ITechAppli#STATE_2_STARTED} does nothing
     * <li> {@link ITechAppli#STATE_1_LOADED} starts the app
@@ -84,15 +92,13 @@ public interface IAppli extends ITechAppli, IStringable {
     * @throws IllegalStateException when not in {@link ITechAppli#STATE_2_STARTED} state.
     */
    public void amsAppPause();
-   
-   
+
    /**
     * Must be called when state 
     * 
     * @throws IllegalStateException when not in {@link ITechAppli#STATE_3_PAUSED} state.
     */
    public void amsAppResume();
-   
 
    /**
     * This method will return Factory settings of the Apps. Manifest value usually don't change.
@@ -109,6 +115,7 @@ public interface IAppli extends ITechAppli, IStringable {
    public ByteObject getCtxSettingsAppli();
 
    /**
+    * The {@link AppCtx} owner of this appli.
     * 
     * @return
     */
@@ -121,11 +128,57 @@ public interface IAppli extends ITechAppli, IStringable {
     * 
     * A {@link CanvasAppliAbstract} always has a non null {@link CanvasHostAbstract}
     * 
-    * @param id
-    * @param tech when null returns the default canvas for the given id, {@link IBOCanvasHost}
+    * {@link ICanvasAppli} being {@link IStatorable} the {@link CoreAppView} creates
+    * 
+    * IBOCa
+    * How do you send parameters that are unknown at this level ? Application level parameters.
+    * 
+    * The implementation of this method goes back down to the application level where those
+    * parameters are known.
+    * 
+    * them from saved state.
+    * 
+    * Calling this method twice on a single Canvas Host ? Should not be possible.
+    * 
+    * Its a bonus for such hosts or specific App for those hosts.
+    * 
+    * Can you create a Canvas without using this method ? Directly ?
+    * Does this method doing any registering ? I guess so. But then the Canvas has to register with Appli
+    * since he has to own the AppCtx, that's easy.
+    * 
+    * An {@link ICanvasAppli} implementation belongs to the AppCtx of that application.
+    * 
+    * @param id creation time. or class ID from the Statorable
+    * @param boCanvasHost when null returns the default canvas for the given id, {@link IBOCanvasHost}
     * defining the properties of the canvas.
+    * @param params TODO
     * @return
     */
-   public ICanvasAppli getCanvas(int id, ByteObject tech);
+   public ICanvasAppli createCanvas(int id, ByteObject boCanvasHost, Object params);
+
+
+   /**
+    * Returns an existing canvas. null if id is not linked to a Canvas.
+    * 
+    * When not existing, it has to be fetched using {@link IBOCanvasHost#TCANVAS_OFFSET_03_ID2}
+    * 
+    * Single Responsability Principle -> Avoid mixing Get/Create logics
+    * @param id
+    * @return
+    */
+   public ICanvasAppli getCanvas(int id);
+
+   /**
+    * The {@link ICanvasAppli} of the first {@link ICanvasHost} that was created.
+    * 
+    * <p>
+    * {@link CoreUiCtx} controls the list of existing {@link ICanvasHost}, from which {@link ICanvasAppli}
+    * can be get/set
+    * </p>
+    * 
+    * Shortcut to {@link CoreUiCtx#getCanvasRootHost()}
+    * @return null if none
+    */
+   public ICanvasAppli getCanvasRoot();
 
 }

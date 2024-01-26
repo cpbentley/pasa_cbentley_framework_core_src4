@@ -17,10 +17,12 @@ import pasa.cbentley.core.src4.event.ILifeListener;
 import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.interfaces.ITimeCtrl;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.framework.core.src4.app.AppCtx;
 import pasa.cbentley.framework.core.src4.engine.CoordinatorAbstract;
 import pasa.cbentley.framework.core.src4.interfaces.IDependencies;
 import pasa.cbentley.framework.core.src4.interfaces.IHostCore;
 import pasa.cbentley.framework.core.src4.interfaces.IHostCoreTools;
+import pasa.cbentley.framework.core.src4.interfaces.ILauncherAppli;
 import pasa.cbentley.framework.core.src4.interfaces.ILauncherHost;
 import pasa.cbentley.framework.coredata.src4.ctx.CoreDataCtx;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
@@ -117,6 +119,12 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
       return cuc;
    }
 
+   /**
+    * Called by {@link ILauncherAppli#createAppOnFramework(CoreFrameworkCtx)}.
+    * 
+    * It needs app dependencies to create the {@link AppCtx}
+    * @return
+    */
    public IDependencies getDependenciesFromLauncher() {
       return launcher.getDependencies();
    }
