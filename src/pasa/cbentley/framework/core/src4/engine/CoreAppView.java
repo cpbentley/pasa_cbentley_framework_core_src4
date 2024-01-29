@@ -64,6 +64,10 @@ public class CoreAppView extends ObjectCFC implements IStatorOwner {
       try {
          //read the different available
          int numCanvases = statorReader.readInt();
+
+         //#debug
+         toDLog().pInit("Reading state for " + numCanvases + " canvas", null, CoreAppView.class, "stateOwnerCanvasHostsReading", LVL_05_FINE, true);
+
          for (int i = 0; i < numCanvases; i++) {
 
             //int canvasID = statorReader.readInt();
@@ -97,6 +101,9 @@ public class CoreAppView extends ObjectCFC implements IStatorOwner {
       try {
          CanvasHostAbstract[] canvases = cfc.getCUC().getCanvases();
          int numCanvases = canvases.length;
+         //#debug
+         toDLog().pInit("Writing state for " + numCanvases + " canvas", null, CoreAppView.class, "stateOwnerCanvasHostsReading", LVL_05_FINE, true);
+
          //Now write our canvas in the main StatorWriter
          statorWriter.getWriter().writeInt(numCanvases);
          for (int i = 0; i < numCanvases; i++) {

@@ -92,7 +92,13 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       apc.getSettingsBO().increment(IBOCtxSettingsAppli.CTX_APP_OFFSET_05_RUNNING_TIME4, 4, incr);
       state = STATE_4_DESTROYED;
 
-      amsAppExitWriteStator();
+      try {
+         amsAppExitWriteStator();
+      } catch (Exception e) {
+         //#debug
+         toDLog().pEx("msg", this, AppliAbstract.class, "amsAppExit", e);
+         e.printStackTrace();
+      }
 
       subAppExit();
    }
@@ -313,7 +319,6 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    }
 
    public abstract ICanvasAppli createCanvas(int id, ByteObject boCanvasHost, Object params);
-   
 
    public ICanvasAppli getCanvas(int id) {
       ICanvasHost ch = apc.getCUC().getCanvasFromID(id);
@@ -326,6 +331,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    public CoreUiCtx getCUC() {
       return apc.getCUC();
    }
+
    /**
     * Return the active (shown) canvas for the Application.
     * 
@@ -475,12 +481,19 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       if (stator == null) {
          String storeName = getStatorName();
          stator = new StatorCoreData(cfc.getCoreDataCtx(), storeName);
-         stator.checkConfigErase();
-         stator.importFromStore();
+         //dangerous parts where things could go wrong
+         try {
+            stator.checkConfigErase();
+            stator.importFromStore();
+         } catch (Exception e) {
+            //#debug
+            toDLog().pEx("msg", this, AppliAbstract.class, "getStator@488", e);
+            e.printStackTrace();
+            stator = new StatorCoreData(cfc.getCoreDataCtx(), storeName);
+         }
       }
       return stator;
    }
-
 
    /**
     * Delete exsiting settings data on disk 

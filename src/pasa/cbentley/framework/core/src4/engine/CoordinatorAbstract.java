@@ -3,6 +3,8 @@ package pasa.cbentley.framework.core.src4.engine;
 import pasa.cbentley.core.src4.ctx.IEventsCore;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
+import pasa.cbentley.core.src4.logging.ITechDev;
+import pasa.cbentley.core.src4.logging.ITechLvl;
 import pasa.cbentley.framework.core.src4.app.IAppli;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.src4.ctx.ObjectCFC;
@@ -74,6 +76,8 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
    }
 
    /**
+    * Called internally.
+    * Should not be called by classes outside the framework
     * {@link IAppli} notifies the {@link CoordinatorAbstract} that it has entered exit state on its own decision.
     * 
     * Coordinator does the necessary framework cleaning, state saving and exit the process depending on what the canvas owner 
@@ -86,11 +90,15 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
       //#debug
       toDLog().pFlow("", this, CoordinatorAbstract.class, "appliWantBeDestroyed", LVL_05_FINE, true);
 
-      subExit();
+      //will check for 
+      frameworkExit();
+
       //notify parent that we closed. if stand alone. exit
       if (parent != null) {
-
+         //we do not want parent application to die. just notifies it
       } else {
+         //#debug
+         toDLog().pFlow("Calling System.exit(0)", null, CoordinatorAbstract.class, "appliWantBeDestroyed@line97", LVL_05_FINE, true);
          System.exit(0);
       }
    }
@@ -102,13 +110,27 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
       subPause();
    }
 
+   private volatile boolean isExitingAlready;
+
    /**
-    * 
+    * In Any case calling this method does not call any host terminating methods
     */
    public void frameworkExit() {
-      //Ctx Manager Debug gives the whole tree of the application at the time of the exit
       //#debug
-      toDLog().pFlow("", getCFC().getUCtx().getCtxManager(), CoordinatorAbstract.class, "frameworkExit");
+      toDLog().pFlow("isExitingAlready=" + isExitingAlready, null, CoordinatorAbstract.class, "frameworkExit@117", ITechLvl.LVL_05_FINE, ITechDev.DEV_4_THREAD);
+
+      if (isExitingAlready) {
+         //#debug
+         toDLog().pFlow("Thread potential Lock. Exiting method now...", null, CoordinatorAbstract.class, "frameworkExit@117", ITechLvl.LVL_05_FINE, ITechDev.DEV_4_THREAD);
+         return;
+      }
+
+      isExitingAlready = true;
+
+      //Ctx Manager Debug gives the whole tree of the application at the time of the exit
+
+      //#debug
+      toDLog().pFlowBig("StartOfMethod", getCFC().getUCtx().getCtxManager(), CoordinatorAbstract.class, "frameworkExit");
 
       // first send exit hooks to the application
       if (app != null) {
@@ -215,7 +237,7 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
       app.amsAppStart();
 
       //#debug
-      toDLog().pFlow("msg", this, CoordinatorAbstract.class, "initUIThreadInside", LVL_05_FINE, true);
+      toDLog().pFlow("", this, CoordinatorAbstract.class, "initUIThreadInside@line218", LVL_05_FINE, true);
 
       if (cfc.getCUC().getCanvasRootHost() == null) {
          //headless mode no canvas
@@ -226,7 +248,7 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
 
             public void run() {
                //#debug
-               toDLog().pFlow("After Main Launch", CoordinatorAbstract.this, CoordinatorAbstract.class, "startAppli:", LVL_05_FINE, false);
+               toDLog().pFlowBig("[toStringIsFullDebug=true] After Launch", CoordinatorAbstract.this, CoordinatorAbstract.class, "initUIThreadInside");
 
             }
          };
