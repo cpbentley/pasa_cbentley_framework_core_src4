@@ -10,7 +10,7 @@ import pasa.cbentley.framework.coreui.src4.tech.ITechHostUI;
  * Describe the Host framework capabilities to the App.
  * <br>
  * The Host generates the following events to the {@link IAppli}
- * <li> {@link IEventsBentleyFw#EVENT_ID_04_DRAG_DROP} when content has been dragged and dropped
+ * <li> {@link IEventsBentleyFw#PID_02_CANVAS_02_DRAG_DROP} when content has been dragged and dropped
  * 
  * The UI capabilities are described by {@link ITechHostUI}
  * 

@@ -16,11 +16,12 @@ import pasa.cbentley.framework.core.src4.engine.CoordinatorAbstract;
 import pasa.cbentley.framework.core.src4.i8n.StringProducerBasic;
 import pasa.cbentley.framework.core.src4.interfaces.ILauncherHost;
 import pasa.cbentley.framework.coredata.src4.ctx.CoreDataCtx;
+import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IFontFactory;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IImageFactory;
 import pasa.cbentley.framework.coreio.src4.ctx.CoreIOCtx;
 import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
-import pasa.cbentley.framework.coreui.src4.ctx.ITechCtxSettingsCoreUI;
+import pasa.cbentley.framework.coreui.src4.ctx.IBOCtxSettingsCoreUI;
 
 /**
  * Stub context for applications that want to live and die inside the {@link CoreFrameworkCtx}
@@ -53,7 +54,7 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSetting
    public AppCtx(IConfigApp configApp, CoreFrameworkCtx cfc) {
       super(configApp, cfc.getBOC());
       if (configApp == null) {
-         throw new NullPointerException();
+         throw new NullPointerException("Null configApp");
       }
       this.configApp = configApp;
       this.cfc = cfc;
@@ -99,7 +100,7 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSetting
       boolean appDrag = settingsNew.hasFlag(CTX_APP_OFFSET_02_FLAGX, CTX_APP_FLAGX_2_DRAG_DROP);
 
       ByteObject settingsBO = cfc.getCUC().getSettingsBOForModification();
-      settingsBO.setFlag(ITechCtxSettingsCoreUI.CTX_COREUI_OFFSET_01_FLAG1, ITechCtxSettingsCoreUI.CTX_COREUI_FLAG_2_DRAG_DROP, appDrag);
+      settingsBO.setFlag(IBOCtxSettingsCoreUI.CTX_COREUI_OFFSET_01_FLAG1, IBOCtxSettingsCoreUI.CTX_COREUI_FLAG_2_DRAG_DROP, appDrag);
       cfc.getCUC().applyChanges(settingsBO);
    }
 
@@ -128,6 +129,10 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSetting
 
    public CoreFrameworkCtx getCFC() {
       return cfc;
+   }
+
+   public CoreDrawCtx getCDC() {
+      return cfc.getCUC().getCDC();
    }
 
    /**
@@ -181,6 +186,10 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSetting
    }
 
    public IStringProducer getStrings() {
+      return stringProducer;
+   }
+
+   public IStringProducer getStringProducer() {
       return stringProducer;
    }
 

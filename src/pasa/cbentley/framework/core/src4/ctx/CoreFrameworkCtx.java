@@ -106,6 +106,10 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
    public CoreDataCtx getCoreDataCtx() {
       return dac;
    }
+   
+   public CoreDrawCtx getCDC() {
+      return cuc.getCDC();
+   }
 
    public CoreIOCtx getCoreIOCtx() {
       return ioc;

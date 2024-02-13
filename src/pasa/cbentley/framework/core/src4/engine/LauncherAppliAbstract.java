@@ -19,10 +19,10 @@ public abstract class LauncherAppliAbstract extends ObjectU implements ILauncher
    protected final IConfigApp configApp;
 
    public LauncherAppliAbstract(UCtx uc) {
-      this(null,uc);
+      this(uc,null);
    }
    
-   public LauncherAppliAbstract(IConfigApp configApp, UCtx uc) {
+   public LauncherAppliAbstract(UCtx uc, IConfigApp configApp) {
       super(uc);
       this.configApp = configApp;
    }

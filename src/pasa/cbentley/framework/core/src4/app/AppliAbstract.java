@@ -14,6 +14,7 @@ import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.DateUtils;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
+import pasa.cbentley.framework.core.src4.ctx.IEventsCoreFramework;
 import pasa.cbentley.framework.core.src4.ctx.ObjectCFC;
 import pasa.cbentley.framework.core.src4.ctx.ToStringStaticCoreFramework;
 import pasa.cbentley.framework.core.src4.engine.CoreAppModel;
@@ -24,9 +25,11 @@ import pasa.cbentley.framework.coredata.src4.stator.StatorReaderCoreData;
 import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.coreui.src4.engine.CanvasAppliAbstract;
 import pasa.cbentley.framework.coreui.src4.engine.CanvasHostAbstract;
+import pasa.cbentley.framework.coreui.src4.event.AppliEvent;
 import pasa.cbentley.framework.coreui.src4.event.BEvent;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasHost;
+import pasa.cbentley.framework.coreui.src4.interfaces.ITechEventHost;
 
 /**
  * Base implementation of {@link IAppli}.
@@ -89,7 +92,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
 
       //increment running time value.
       int incr = DateUtils.getMinutes(startTime, System.currentTimeMillis());
-      apc.getSettingsBO().increment(IBOCtxSettingsAppli.CTX_APP_OFFSET_05_RUNNING_TIME4, 4, incr);
+      apc.getBOCtxSettings().increment(IBOCtxSettingsAppli.CTX_APP_OFFSET_05_RUNNING_TIME4, 4, incr);
       state = STATE_4_DESTROYED;
 
       try {
@@ -138,16 +141,27 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
 
       CtxManager ctxManager = cfc.getUCtx().getCtxManager();
       ctxManager.stateOwnerRead(stator);
-
+      subAppLoadPostCtxSettings();
       this.stateOwnerRead(stator);
    }
+
+   /**
+    * Called after the reading of code ctx saved state and before application saved ctx state.. 
+    */
+   protected abstract void subAppLoadPostCtxSettings();
 
    public void amsAppPause() {
       if (state != STATE_2_STARTED) {
          throwExceptionBadState("Pause");
       }
 
+      //launch an event in the GUI thread. here we are in the application thread
+      AppliEvent ae = new AppliEvent(getCUC(), ITechEventHost.ACTION_8_APPLI_PAUSED);
+      ae.setEventID(IEventsCoreFramework.EVENT_ID_06_APP_PAUSED);
+      getCUC().publishEvent(ae);
+
       subAppPause();
+
       state = STATE_3_PAUSED;
    }
 
@@ -159,7 +173,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
          throwExceptionBadState("Resume");
       }
       int incr = DateUtils.getMinutes(pauseTime, System.currentTimeMillis());
-      apc.getSettingsBO().increment(IBOCtxSettingsAppli.CTX_APP_OFFSET_06_STAND_BY_TIME4, 4, incr);
+      apc.getBOCtxSettings().increment(IBOCtxSettingsAppli.CTX_APP_OFFSET_06_STAND_BY_TIME4, 4, incr);
       subAppUnPaused();
       state = STATE_2_STARTED;
    }
@@ -215,7 +229,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       IStringProducer strings = apc.getStrings();
       //coreStateApp are fixed global state defined by the framework for the app ctx
       //its rarely updated. its strucutre is well known in advance
-      ByteObject coreStateApp = apc.getSettingsBO();
+      ByteObject coreStateApp = apc.getBOCtxSettings();
       String suffix = coreStateApp.getVarCharString(CTX_APP_OFFSET_09_VARCHAR_LANSUFFIX2, 2);
 
       LocaleID lc = strings.getLocale(suffix);
@@ -371,7 +385,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
     * @return {@link IBOCtxSettingsAppli}
     */
    public ByteObject getCtxSettingsAppli() {
-      return apc.getSettingsBO();
+      return apc.getBOCtxSettings();
    }
 
    /**

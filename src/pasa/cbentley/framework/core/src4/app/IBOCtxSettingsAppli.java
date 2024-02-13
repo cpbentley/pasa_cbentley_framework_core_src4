@@ -17,7 +17,7 @@ import pasa.cbentley.framework.core.src4.interfaces.IBOHost;
  * A new event Property change is fired.
  * <br>
  * <br>
- * <li>{@link IEventsBentleyFw#EVENT_ID_01_DEVICE_UPDATE}
+ * <li>{@link IEventsBentleyFw#PID_01_DEVICE_05_UPDATE}
  * 
  * The host registered on the Device ProducerID .
  * <br>

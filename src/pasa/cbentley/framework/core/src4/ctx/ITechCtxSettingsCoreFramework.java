@@ -2,7 +2,7 @@ package pasa.cbentley.framework.core.src4.ctx;
 
 import pasa.cbentley.byteobjects.src4.core.interfaces.IBOCtxSettings;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IGraphics;
-import pasa.cbentley.framework.coredraw.src4.interfaces.ITechDrawer;
+import pasa.cbentley.framework.coredraw.src4.interfaces.IBOGraphics;
 
 public interface ITechCtxSettingsCoreFramework extends IBOCtxSettings {
 

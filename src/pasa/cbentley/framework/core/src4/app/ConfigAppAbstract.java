@@ -5,7 +5,7 @@ import pasa.cbentley.core.src4.ctx.ConfigAbstract;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
-import pasa.cbentley.framework.coredraw.src4.interfaces.ITechDrawer;
+import pasa.cbentley.framework.coredraw.src4.interfaces.ITechGraphics;
 
 public abstract class ConfigAppAbstract extends ConfigAbstractBO implements IConfigApp {
 
@@ -26,7 +26,7 @@ public abstract class ConfigAppAbstract extends ConfigAbstractBO implements ICon
       super(uc);
       this.name = name;
       isVolatile = false; //by default
-      aliasMode = ITechDrawer.MODSET_APP_ALIAS_0_BEST;
+      aliasMode = ITechGraphics.MODSET_APP_ALIAS_0_BEST;
    }
 
    public String getAppName() {

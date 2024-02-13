@@ -7,7 +7,8 @@ import java.util.Hashtable;
 
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.IStaticIDs;
-import pasa.cbentley.core.src4.i8n.IString;
+import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.i8n.I8nString;
 import pasa.cbentley.core.src4.i8n.IStringMapper;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
 import pasa.cbentley.core.src4.i8n.LString;
@@ -83,28 +84,28 @@ public class StringProducerBasic extends StringProducerAbstract implements IStri
       }
    }
 
-   public IString getIStr(String key) {
+   public I8nString getIStr(String key) {
       LString ls = new LString(this, key, null);
       return ls;
    }
 
-   public IString getIString(int key) {
+   public I8nString getIString(int key) {
       LString ls = new LString(this, key, null);
       return ls;
    }
 
-   public IString getIString(String key, String def) {
+   public I8nString getIString(String key, String def) {
       LString ls = new LString(this, key, def);
       return ls;
    }
 
-   public IString getIString(String key, String def, String suffix) {
+   public I8nString getIString(String key, String def, String suffix) {
       LString ls = new LString(this, key, def);
       ls.setSuffix(suffix);
       return ls;
    }
 
-   public IString getIStringKey(int key, String def) {
+   public I8nString getIStringKey(int key, String def) {
       LString ls = new LString(this, key, def);
       return ls;
    }
@@ -168,7 +169,7 @@ public class StringProducerBasic extends StringProducerAbstract implements IStri
       return null;
    }
 
-   public IString getStrSuffixed(String key, String suffix) {
+   public I8nString getStrSuffixed(String key, String suffix) {
       LString ls = new LString(this, key, null);
       ls.setSuffix(suffix);
       return ls;
