@@ -50,7 +50,7 @@ public class StringProducerBasic extends StringProducerAbstract implements IStri
    private Hashtable                paths      = new Hashtable();
 
    public StringProducerBasic(CoreFrameworkCtx cfc) {
-      super(cfc.getUCtx(), new LocaleID[] { new LocaleID(cfc.getUCtx(), "English", "en") });
+      super(cfc.getUC(), new LocaleID[] { new LocaleID(cfc.getUC(), "English", "en") });
       this.cfc = cfc;
       ictxs = new IntToObjects(uc);
    }

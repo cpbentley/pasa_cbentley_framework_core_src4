@@ -50,7 +50,7 @@ public class ObjectCFC implements IStringable {
    }
 
    public UCtx toStringGetUCtx() {
-      return cfc.getUCtx();
+      return cfc.getUC();
    }
 
    //#enddebug

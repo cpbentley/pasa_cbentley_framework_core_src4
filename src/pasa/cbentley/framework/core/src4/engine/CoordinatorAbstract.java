@@ -130,7 +130,7 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
       //Ctx Manager Debug gives the whole tree of the application at the time of the exit
 
       //#debug
-      toDLog().pFlowBig("StartOfMethod", getCFC().getUCtx().getCtxManager(), CoordinatorAbstract.class, "frameworkExit");
+      toDLog().pFlowBig("StartOfMethod", getCFC().getUC().getCtxManager(), CoordinatorAbstract.class, "frameworkExit");
 
       // first send exit hooks to the application
       if (app != null) {
@@ -141,7 +141,7 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
 
       //for all those objects which cannot be accounted for here.
       //downside is that the order of the calls is not under our control. Order in which they were added
-      cfc.getUCtx().getEventBusRoot().sendNewEvent(IEventsCore.PID_04_LIFE, IEventsCore.PID_04_LIFE_5_DESTROYED, this);
+      cfc.getUC().getEventBusRoot().sendNewEvent(IEventsCore.PID_04_LIFE, IEventsCore.PID_04_LIFE_5_DESTROYED, this);
 
       //then send exit hooks to the Manager subclass. this enable them to close VLC instances
       subExit(); //TODO send exit hooks to module that use VLC 

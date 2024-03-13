@@ -7,7 +7,9 @@ import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.ABOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IConfigBO;
+import pasa.cbentley.byteobjects.src4.ctx.IStaticIDsBO;
 import pasa.cbentley.core.src4.api.ApiManager;
+import pasa.cbentley.core.src4.ctx.CtxManager;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.IStaticIDs;
 import pasa.cbentley.core.src4.event.EventBusArray;
@@ -73,6 +75,10 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
       eventBus = new EventBusArray(uc, this, getEventBaseTopology());
 
       boModule = new BOModuleCoreFramework(this);
+      
+      CtxManager cm = uc.getCtxManager();
+      
+      cm.registerStaticRange(this, IStaticIDsBO.SID_BYTEOBJECT_TYPES, IBOTypesCoreFramework.AZ_BOTYPE_FW_A, IBOTypesCoreFramework.AZ_BOTYPE_FW_Z);
 
    }
 
@@ -81,7 +87,7 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
    }
 
    public ApiManager getApiManager() {
-      return getUCtx().getApiManager();
+      return getUC().getApiManager();
    }
 
    public BOCtx getBOC() {

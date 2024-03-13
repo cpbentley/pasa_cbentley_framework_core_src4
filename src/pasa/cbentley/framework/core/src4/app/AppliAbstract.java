@@ -113,7 +113,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       //modules outside the app have static settings. This is now all those objects are saved
       StatorCoreData stator = getStator();
 
-      CtxManager ctxManager = cfc.getUCtx().getCtxManager();
+      CtxManager ctxManager = cfc.getUC().getCtxManager();
       ctxManager.stateOwnerWrite(stator);
 
       this.stateOwnerWrite(stator);
@@ -139,7 +139,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    protected void amsAppLoadStator() {
       StatorCoreData stator = getStator();
 
-      CtxManager ctxManager = cfc.getUCtx().getCtxManager();
+      CtxManager ctxManager = cfc.getUC().getCtxManager();
       ctxManager.stateOwnerRead(stator);
       subAppLoadPostCtxSettings();
       this.stateOwnerRead(stator);
@@ -435,7 +435,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
     */
    public IntToObjects getProfiles() {
       String storeName = getProfileStoreName();
-      IntToObjects its = new IntToObjects(apc.getUCtx());
+      IntToObjects its = new IntToObjects(apc.getUC());
       IByteStore bs = getByteStore();
       if (bs != null) {
          int base = bs.getBase();

@@ -195,7 +195,7 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSetting
 
    public WorkerThread getWorkerThreadApp() {
       if (workerThread == null) {
-         workerThread = new WorkerThread(getUCtx());
+         workerThread = new WorkerThread(getUC());
       }
       return workerThread;
    }
