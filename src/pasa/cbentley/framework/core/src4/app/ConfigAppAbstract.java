@@ -1,19 +1,21 @@
 package pasa.cbentley.framework.core.src4.app;
 
 import pasa.cbentley.byteobjects.src4.ctx.ConfigAbstractBO;
-import pasa.cbentley.core.src4.ctx.ConfigAbstract;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.framework.coredraw.src4.interfaces.ITechGraphics;
 
 public abstract class ConfigAppAbstract extends ConfigAbstractBO implements IConfigApp {
 
-   protected final String name;
+   protected int          aliasMode;
+
+   protected boolean      isAppStatorRead = true;
+
+   protected boolean      isAppStatorWrite = true;
 
    protected boolean      isVolatile;
 
-   protected int          aliasMode;
+   protected final String name;
 
    /**
     * ID that will be used to identify data stores and other unique
@@ -29,35 +31,46 @@ public abstract class ConfigAppAbstract extends ConfigAbstractBO implements ICon
       aliasMode = ITechGraphics.MODSET_APP_ALIAS_0_BEST;
    }
 
-   public String getAppName() {
-      return name;
+   protected void cloneMeSet(ConfigAppAbstract config) {
+      config.isVolatile = this.isVolatile;
    }
 
    public int getAliasMode() {
       return aliasMode;
    }
 
-   public boolean isVolatileData() {
-      return isVolatile;
-   }
-
-   protected void cloneMeSet(ConfigAppAbstract config) {
-      config.isVolatile = this.isVolatile;
+   public String getAppName() {
+      return name;
    }
 
    public String getProfileNameDef() {
       return "default";
    }
-   
+
+   public boolean isAppStatorRead() {
+      return isAppStatorRead;
+   }
+
+   public boolean isAppStatorWrite() {
+      return isAppStatorWrite;
+   }
+
+   public boolean isVolatileData() {
+      return isVolatile;
+   }
 
    //#mdebug
    public void toString(Dctx dc) {
       dc.root(this, ConfigAppAbstract.class, 60);
       toStringPrivate(dc);
       super.toString(dc.sup());
-   }
-
-   private void toStringPrivate(Dctx dc) {
+      
+      dc.appendVarWithNewLine("isAppStatorRead", isAppStatorRead);
+      dc.appendVarWithSpace("isAppStatorWrite", isAppStatorWrite);
+      dc.appendVarWithSpace("isVolatile", isVolatile);
+      
+      dc.appendVarWithNewLine("aliasMode", aliasMode);
+      
       
    }
 
@@ -67,8 +80,11 @@ public abstract class ConfigAppAbstract extends ConfigAbstractBO implements ICon
       super.toString1Line(dc.sup1Line());
    }
 
-   //#enddebug
-   
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("name", name);
 
+   }
+
+   //#enddebug
 
 }

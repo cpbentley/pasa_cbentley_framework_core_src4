@@ -24,7 +24,7 @@ import pasa.cbentley.framework.core.src4.engine.CoordinatorAbstract;
 import pasa.cbentley.framework.core.src4.interfaces.IDependencies;
 import pasa.cbentley.framework.core.src4.interfaces.IHostCore;
 import pasa.cbentley.framework.core.src4.interfaces.IHostCoreTools;
-import pasa.cbentley.framework.core.src4.interfaces.ILauncherAppli;
+import pasa.cbentley.framework.core.src4.interfaces.ICreatorAppli;
 import pasa.cbentley.framework.core.src4.interfaces.ILauncherHost;
 import pasa.cbentley.framework.coredata.src4.ctx.CoreDataCtx;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
@@ -130,7 +130,7 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
    }
 
    /**
-    * Called by {@link ILauncherAppli#createAppOnFramework(CoreFrameworkCtx)}.
+    * Called by {@link ICreatorAppli#createAppOnFramework(CoreFrameworkCtx)}.
     * 
     * It needs app dependencies to create the {@link AppCtx}
     * @return

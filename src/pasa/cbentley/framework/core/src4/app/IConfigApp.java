@@ -10,7 +10,7 @@ import pasa.cbentley.framework.coreio.src4.ctx.IConfigCoreIO;
 import pasa.cbentley.framework.coreui.src4.ctx.IConfigCoreUI;
 
 /**
- * Config manifest
+ * Configuration for the {@link AppCtx} module.
  * 
  * @author Charles Bentley
  *
@@ -56,5 +56,17 @@ public interface IConfigApp extends IConfigBO {
     * @return
     */
    public String getProfileNameDef();
+   
+   /**
+    * Sets to false to stop app from writing its state when exiting 
+    * @return
+    */
+   public boolean isAppStatorWrite();
+
+   /**
+    * Sets to false to stop state reading 
+    * @return
+    */
+   public boolean isAppStatorRead();
 
 }

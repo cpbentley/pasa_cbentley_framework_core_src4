@@ -8,7 +8,7 @@ import pasa.cbentley.core.src4.logging.ITechLvl;
 import pasa.cbentley.framework.core.src4.app.IAppli;
 import pasa.cbentley.framework.core.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.src4.ctx.ObjectCFC;
-import pasa.cbentley.framework.core.src4.interfaces.ILauncherAppli;
+import pasa.cbentley.framework.core.src4.interfaces.ICreatorAppli;
 import pasa.cbentley.framework.core.src4.interfaces.ILauncherHost;
 import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
 
@@ -42,7 +42,7 @@ import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
  * The {@link ILauncherHost} creates a specific instance of {@link CoordinatorAbstract} which
  * will provide getter access to specific hosts such as Android's Activity or J2ME MIDlet
  * 
- * The {@link CoordinatorAbstract} starts the appli with a {@link ILauncherAppli}
+ * The {@link CoordinatorAbstract} starts the appli with a {@link ICreatorAppli}
  * 
  * For other stuff, see {@link CoreFrameworkCtx}
  * </p>
@@ -54,7 +54,7 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
 
    protected IAppli         app;
 
-   protected ILauncherAppli launcherAppli;
+   protected ICreatorAppli launcherAppli;
 
    protected ILauncherHost  launcherHost;
 
@@ -182,7 +182,7 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
     * 
     * @param launcherAppli
     */
-   public void frameworkStart(ILauncherAppli launcherAppli) {
+   public void frameworkStart(ICreatorAppli launcherAppli) {
       if (app != null) {
          throw new IllegalStateException("A Coordinator is a one time use for a single Appli. Create another coordinator");
          //app.amsDestroyApp();
@@ -205,7 +205,7 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
       return cfc;
    }
 
-   public ILauncherAppli getLauncherAppli() {
+   public ICreatorAppli getLauncherAppli() {
       return launcherAppli;
    }
 
@@ -277,7 +277,7 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
     * 
     * @param launcherAppli
     */
-   public void setAppliLauncher(ILauncherAppli launcherAppli) {
+   public void setAppliLauncher(ICreatorAppli launcherAppli) {
       this.launcherAppli = launcherAppli;
    }
 

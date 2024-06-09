@@ -79,7 +79,7 @@ public class CoreAppView extends ObjectCFC implements IStatorOwner {
             CanvasAppliAbstract canvasAppli = (CanvasAppliAbstract) statorReader.readObject();
 
             //#debug
-            toDLog().pInit("UnWrapped", canvasAppli, CoreAppView.class, "stateOwnerCanvasHostsReading", LVL_05_FINE, true);
+            toDLog().pInit("UnWrapped", canvasAppli, CoreAppView.class, "stateOwnerCanvasHostsReading@82", LVL_05_FINE, true);
             //statorReader.readerToStatorable(canvasAppli);
 
          }

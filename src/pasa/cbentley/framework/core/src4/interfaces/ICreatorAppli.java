@@ -18,12 +18,12 @@ import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
  * 
  * It allows to list different appli configurations, save them, show them to the user.
  * 
- * {@link ILauncherAppli} is kinda the Android manifest.
+ * {@link ICreatorAppli} is kinda the Android manifest.
  * It provides hook ups and configuration about the application.
  * @author Charles Bentley
  *
  */
-public interface ILauncherAppli extends IStringable {
+public interface ICreatorAppli extends IStringable {
 
    /**
     * Create the {@link IAppli} in the given framework context {@link CoreFrameworkCtx}.
@@ -44,6 +44,10 @@ public interface ILauncherAppli extends IStringable {
     */
    public IAppli createAppOnFramework(CoreFrameworkCtx cfc);
 
+   /**
+    * 
+    * @return
+    */
    public UCtx getUC();
 
 }

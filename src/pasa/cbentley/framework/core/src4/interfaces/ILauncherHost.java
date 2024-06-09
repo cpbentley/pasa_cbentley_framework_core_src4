@@ -39,7 +39,7 @@ public interface ILauncherHost extends IStringable {
    /**
     * Create the {@link IConfigApp} for the {@link AppCtx} that is created by 
     * 
-    * {@link ILauncherHost#startAppli(ILauncherAppli)}
+    * {@link ILauncherHost#startAppli(ICreatorAppli)}
     * 
     * @param uc
     * @return {@link IConfigApp}
@@ -58,7 +58,7 @@ public interface ILauncherHost extends IStringable {
    public CoordinatorAbstract getCoordinator();
 
    /**
-    * Specific {@link IDependencies} for the {@link ILauncherAppli}. 
+    * Specific {@link IDependencies} for the {@link ICreatorAppli}. 
     * 
     * Example
     * <li> A Sound Ctx for generating sounds 
@@ -70,12 +70,12 @@ public interface ILauncherHost extends IStringable {
    public IDependencies getDependencies();
 
    /**
-    * Assigns the {@link ILauncherAppli} and creates the {@link IAppli} with the {@link ILauncherAppli#createAppOnFramework(CoreFrameworkCtx)}.
+    * Assigns the {@link ICreatorAppli} and creates the {@link IAppli} with the {@link ICreatorAppli#createAppOnFramework(CoreFrameworkCtx)}.
     * 
-    * @param launcherAppli {@link ILauncherAppli}
+    * @param launcherAppli {@link ICreatorAppli}
     * @throws IllegalStateException if Launcher has already launched an {@link IAppli}
     */
-   public void startAppli(ILauncherAppli launcherAppli);
+   public void startAppli(ICreatorAppli launcherAppli);
 
    /**
     * Called by {@link CoordinatorAbstract} when application exits.

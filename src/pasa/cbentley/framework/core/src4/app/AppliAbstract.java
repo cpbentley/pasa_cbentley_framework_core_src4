@@ -3,6 +3,7 @@ package pasa.cbentley.framework.core.src4.app;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.stator.ITechStatorBO;
 import pasa.cbentley.core.src4.ctx.CtxManager;
+import pasa.cbentley.core.src4.ctx.IConfigU;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
 import pasa.cbentley.core.src4.i8n.LocaleID;
@@ -96,7 +97,13 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       state = STATE_4_DESTROYED;
 
       try {
-         amsAppExitWriteStator();
+         IConfigApp configApp = apc.getConfigApp();
+         if (configApp.isAppStatorWrite()) {
+            amsAppExitWriteStator();
+         } else {
+            //#debug
+            toDLog().pFlow("isAppStatorWrite returns false. Does not write App settings to disk", configApp, AppliAbstract.class, "amsAppExit@103", LVL_05_FINE, true);
+         }
       } catch (Exception e) {
          //#debug
          toDLog().pEx("msg", this, AppliAbstract.class, "amsAppExit", e);
@@ -107,9 +114,11 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    }
 
    /**
-    * Inverse of {@link AppliAbstract#amsAppLoadStator()}
     */
    protected void amsAppExitWriteStator() {
+      //#debug
+      toDLog().pFlow("Writing State From Disk", this, AppliAbstract.class, "amsAppExitWriteStator@116", LVL_05_FINE, true);
+
       //modules outside the app have static settings. This is now all those objects are saved
       StatorCoreData stator = getStator();
 
@@ -119,6 +128,9 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       this.stateOwnerWrite(stator);
 
       stator.serializeToStore();
+
+      //#debug
+      toDLog().pData("Stator Written", stator, AppliAbstract.class, "amsAppExitWriteStator@124", LVL_05_FINE, false);
    }
 
    /**
@@ -128,7 +140,13 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       if (state != STATE_0_CREATED) {
          throwExceptionBadState("Pause");
       }
-      amsAppLoadStator();
+      try {
+         amsAppLoadStator();
+      } catch (Exception e) {
+         //#debug
+         toDLog().pEx("Error while loading state", this, AppliAbstract.class, "amsAppLoad", e);
+         e.printStackTrace();
+      }
       subAppLoad();
       state = STATE_1_LOADED;
    }
@@ -137,12 +155,65 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
     * Inverse of {@link AppliAbstract#amsAppExitWriteStator()}
     */
    protected void amsAppLoadStator() {
-      StatorCoreData stator = getStator();
+      //#debug
+      toDLog().pFlow("Reading State From Disk", this, AppliAbstract.class, "amsAppLoadStator@150", LVL_05_FINE, true);
 
-      CtxManager ctxManager = cfc.getUC().getCtxManager();
-      ctxManager.stateOwnerRead(stator);
+      StatorCoreData stator = null;
+      IConfigU configU = apc.getUC().getConfigU();
+      if (configU.isStatorRead()) {
+         stator = getStator();
+         CtxManager ctxManager = cfc.getUC().getCtxManager();
+         ctxManager.stateOwnerRead(stator);
+      } else {
+         //#debug
+         toDLog().pFlow("isStatorRead returns false. Does not read settings from disk", configU, AppliAbstract.class, "amsAppLoadStator@147", LVL_05_FINE, true);
+
+      }
+
+      //in call stator cases. this method must be called
       subAppLoadPostCtxSettings();
-      this.stateOwnerRead(stator);
+
+      IConfigApp configApp = apc.getConfigApp();
+      if (configApp.isAppStatorRead()) {
+         //#debug
+         toDLog().pFlow("isAppStatorRead returns true. Reading settings from disk", configApp, AppliAbstract.class, "amsAppLoadStator@147", LVL_05_FINE, true);
+
+         if (stator != null) {
+            this.stateOwnerRead(stator);
+            
+            
+            amsAppLoadStatorCheckFail(stator);
+            
+         } else {
+            //#debug
+            toDLog().pFlow("Stator is null because of  IConfigU", configU, AppliAbstract.class, "amsAppLoadStator@147", LVL_05_FINE, true);
+         }
+      } else {
+         //#debug
+         toDLog().pFlow("isAppStatorRead returns false. Does not read settings from disk", configApp, AppliAbstract.class, "amsAppLoad@147", LVL_05_FINE, true);
+
+      }
+
+
+   }
+
+   private void amsAppLoadStatorCheckFail(StatorCoreData stator) {
+      if (stator.isFailed()) {
+         //TODO test again with changed BO type
+         //we have exceptions
+
+         //#debug
+         toDLog().pAlways("Error while loading previous state. Erasing old state...", this, AppliAbstract.class, "amsAppLoadStator", LVL_09_WARNING, true);
+         stator.deleteDataAll();
+
+         //#debug
+         toDLog().pAlways("Previous state deleted. Loading again...", this, AppliAbstract.class, "amsAppLoadStator", LVL_09_WARNING, true);
+
+         CtxManager ctxManager = cfc.getUC().getCtxManager();
+         ctxManager.stateOwnerRead(stator);
+         subAppLoadPostCtxSettings();
+         this.stateOwnerRead(stator);
+      }
    }
 
    /**
@@ -210,7 +281,6 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
     * <li> If first run, calls install {@link AppliAbstract#subAppFirstLaunch()}
     * </ol>
     * <li> {@link LocaleID}
-    * <Li> {@link LocaleID}
     * <li> {@link AppliAbstract#loadState()}
     * <li> {@link AppliAbstract#loadCoreAppModel()}
     * <li> {@link AppliAbstract#loadCoreViewModel()}
@@ -542,6 +612,13 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    }
 
    /**
+    * In this framework, we assume that first Canvas shown is single. That the minimum requirement for hosts.
+    * 
+    * <p>
+    * If Application requires more stand alone canvases, it will create them itself in the {@link AppliAbstract#subAppStarted()} implementation.
+    * provided the underlying host has the capabilities.
+    * </p>
+    * 
     * Called at startup by {@link AppliAbstract#amsAppStartInside()}
     */
    protected void showCanvasDefault() {
@@ -615,7 +692,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    protected abstract void subAppLoad();
 
    /**
-    * Convetion is that sub prefixed methods are abstract and don't have to be called
+    * Convention is that sub prefixed methods are abstract and don't have to be called
     */
    protected abstract void subAppPause();
 
@@ -636,7 +713,11 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    }
 
    /**
+    * When the App is launched for the first time with a new code version.
     * 
+    * <p>
+    * Some data has to be migrated to new formats
+    * </p>
     */
    protected void subAppVersionChange() {
 
