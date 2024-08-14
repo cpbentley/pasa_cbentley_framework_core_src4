@@ -3,11 +3,11 @@ package pasa.cbentley.framework.core.framework.src4.app;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
+import pasa.cbentley.framework.core.data.src4.ctx.IConfigCoreData;
 import pasa.cbentley.framework.core.framework.src4.ctx.IConfigCoreFramework;
 import pasa.cbentley.framework.core.io.src4.ctx.IConfigCoreIO;
-import pasa.cbentley.framework.coredata.src4.ctx.IConfigCoreData;
+import pasa.cbentley.framework.core.ui.src4.ctx.IConfigCoreUi;
 import pasa.cbentley.framework.coredraw.src4.ctx.IConfigCoreDraw;
-import pasa.cbentley.framework.coreui.src4.ctx.IConfigCoreUi;
 
 /**
  * When we want host configuration to be part of the App configuration

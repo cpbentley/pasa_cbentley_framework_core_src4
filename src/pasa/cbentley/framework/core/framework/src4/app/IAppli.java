@@ -7,12 +7,12 @@ import pasa.cbentley.framework.core.framework.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.framework.src4.engine.CoordinatorAbstract;
 import pasa.cbentley.framework.core.framework.src4.engine.CoreAppView;
 import pasa.cbentley.framework.core.framework.src4.interfaces.IBOHost;
-import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
-import pasa.cbentley.framework.coreui.src4.engine.CanvasAppliAbstract;
-import pasa.cbentley.framework.coreui.src4.engine.CanvasHostAbstract;
-import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
-import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasHost;
-import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
+import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
+import pasa.cbentley.framework.core.ui.src4.engine.CanvasAppliAbstract;
+import pasa.cbentley.framework.core.ui.src4.engine.CanvasHostAbstract;
+import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasAppli;
+import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasHost;
+import pasa.cbentley.framework.core.ui.src4.tech.IBOCanvasHost;
 
 /**
  * Interface for the host for controlling the application.

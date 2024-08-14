@@ -3,8 +3,8 @@ package pasa.cbentley.framework.core.framework.src4.interfaces;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.framework.core.framework.src4.ctx.CoreFrameworkCtx;
-import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
-import pasa.cbentley.framework.coreui.src4.interfaces.IHostGestures;
+import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
+import pasa.cbentley.framework.core.ui.src4.interfaces.IHostGestures;
 
 /**
  * 

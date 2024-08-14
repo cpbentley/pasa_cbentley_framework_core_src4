@@ -18,6 +18,7 @@ import pasa.cbentley.core.src4.interfaces.IHost;
 import pasa.cbentley.core.src4.interfaces.IHostFeature;
 import pasa.cbentley.core.src4.interfaces.ITimeCtrl;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.framework.core.data.src4.ctx.CoreDataCtx;
 import pasa.cbentley.framework.core.framework.src4.app.AppCtx;
 import pasa.cbentley.framework.core.framework.src4.engine.CoordinatorAbstract;
 import pasa.cbentley.framework.core.framework.src4.interfaces.ICreatorAppli;
@@ -25,10 +26,9 @@ import pasa.cbentley.framework.core.framework.src4.interfaces.IDependencies;
 import pasa.cbentley.framework.core.framework.src4.interfaces.IHostCoreTools;
 import pasa.cbentley.framework.core.framework.src4.interfaces.ILauncherHost;
 import pasa.cbentley.framework.core.io.src4.ctx.CoreIOCtx;
-import pasa.cbentley.framework.coredata.src4.ctx.CoreDataCtx;
+import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IGraphics;
-import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
 
 /**
  * 5 Core Context which is the required minimum for a working App

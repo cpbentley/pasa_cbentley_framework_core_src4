@@ -12,21 +12,21 @@ import pasa.cbentley.core.src4.stator.Stator;
 import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.structs.IntToObjects;
+import pasa.cbentley.framework.core.data.src4.stator.StatorCoreData;
+import pasa.cbentley.framework.core.data.src4.stator.StatorReaderCoreData;
+import pasa.cbentley.framework.core.data.src4.stator.StatorWriterCoreData;
 import pasa.cbentley.framework.core.framework.src4.app.AppliAbstract;
 import pasa.cbentley.framework.core.framework.src4.app.IAppli;
 import pasa.cbentley.framework.core.framework.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.framework.src4.ctx.ObjectCFC;
-import pasa.cbentley.framework.coredata.src4.stator.StatorCoreData;
-import pasa.cbentley.framework.coredata.src4.stator.StatorReaderCoreData;
-import pasa.cbentley.framework.coredata.src4.stator.StatorWriterCoreData;
-import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
-import pasa.cbentley.framework.coreui.src4.ctx.IBOTypesCoreUi;
-import pasa.cbentley.framework.coreui.src4.engine.CanvasAppliAbstract;
-import pasa.cbentley.framework.coreui.src4.engine.CanvasHostAbstract;
-import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
-import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasHost;
-import pasa.cbentley.framework.coreui.src4.tech.IBOCanvasHost;
-import pasa.cbentley.framework.coreui.src4.tech.IBOFramePos;
+import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
+import pasa.cbentley.framework.core.ui.src4.ctx.IBOTypesCoreUi;
+import pasa.cbentley.framework.core.ui.src4.engine.CanvasAppliAbstract;
+import pasa.cbentley.framework.core.ui.src4.engine.CanvasHostAbstract;
+import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasAppli;
+import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasHost;
+import pasa.cbentley.framework.core.ui.src4.tech.IBOCanvasHost;
+import pasa.cbentley.framework.core.ui.src4.tech.IBOFramePos;
 
 /**
  * 

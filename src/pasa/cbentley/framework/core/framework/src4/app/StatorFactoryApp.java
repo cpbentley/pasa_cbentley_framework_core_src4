@@ -6,8 +6,8 @@ import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.stator.IStatorFactory;
 import pasa.cbentley.core.src4.stator.IStatorable;
 import pasa.cbentley.core.src4.stator.StatorReader;
-import pasa.cbentley.framework.coreui.src4.engine.CanvasAppliAbstract;
-import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
+import pasa.cbentley.framework.core.ui.src4.engine.CanvasAppliAbstract;
+import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasAppli;
 
 /**
  * 

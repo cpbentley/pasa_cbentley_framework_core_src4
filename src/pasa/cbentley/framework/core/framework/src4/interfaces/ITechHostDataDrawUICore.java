@@ -1,6 +1,6 @@
 package pasa.cbentley.framework.core.framework.src4.interfaces;
 
-import pasa.cbentley.framework.coreui.src4.tech.ITechHostDataDrawUi;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechHostDataDrawUi;
 
 public interface ITechHostDataDrawUICore extends ITechHostDataDrawUi {
 

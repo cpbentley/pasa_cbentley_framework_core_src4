@@ -7,12 +7,11 @@ import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.logging.ITechDev;
 import pasa.cbentley.core.src4.logging.ITechLvl;
 import pasa.cbentley.framework.core.framework.src4.app.IAppli;
-import pasa.cbentley.framework.core.framework.src4.app.LifeContext;
 import pasa.cbentley.framework.core.framework.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.framework.src4.ctx.ObjectCFC;
 import pasa.cbentley.framework.core.framework.src4.interfaces.ICreatorAppli;
 import pasa.cbentley.framework.core.framework.src4.interfaces.ILauncherHost;
-import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
+import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasAppli;
 
 /**
  * 
@@ -54,15 +53,22 @@ import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasAppli;
  */
 public abstract class CoordinatorAbstract extends ObjectCFC implements IStringable {
 
-   protected IAppli         app;
+   protected IAppli        app;
+
+   /**
+    * We want a testCase to be able to read this
+    */
+   private volatile boolean hasStartedInitUI = false;
+
+   private volatile boolean isExitingAlready;
 
    protected ICreatorAppli launcherAppli;
 
-   protected ILauncherHost  launcherHost;
+   protected ILauncherHost launcherHost;
 
-   protected IAppli         parent;
+   protected IAppli        parent;
 
-   private boolean          toStringIsFullDebug;
+   private boolean         toStringIsFullDebug;
 
    /**
     * The coordinator created needs an {@link ILauncherHost}
@@ -90,7 +96,7 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
     */
    public void appliWantBeDestroyed() {
       //#debug
-      toDLog().pFlow("", this, CoordinatorAbstract.class, "appliWantBeDestroyed", LVL_05_FINE, true);
+      toDLog().pFlow("", this, CoordinatorAbstract.class, "appliWantBeDestroyed@93", LVL_05_FINE, true);
 
       //will check for 
       frameworkExit();
@@ -111,8 +117,6 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
    public void appliWantBePaused() {
       subPause();
    }
-
-   private volatile boolean isExitingAlready;
 
    /**
     * In Any case calling this method does not call any host terminating methods
@@ -149,7 +153,6 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
       subExit(); //TODO send exit hooks to module that use VLC 
 
       cfc.getCUC().onExit();
-      
 
       //host knows how to clean exit app, depending on wrapper context
       launcherHost.appExit();
@@ -215,11 +218,6 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
    }
 
    /**
-    * We want a testCase to be able to read this
-    */
-   private volatile boolean hasStartedInitUI = false;
-
-   /**
     * Called by implementation inside its ui thread
     */
    protected void initUIThreadInside() {
@@ -258,21 +256,13 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
       }
    }
 
+   public boolean isHasStartedInitUI() {
+      return hasStartedInitUI;
+   }
+
    public boolean isLoaded() {
       return app != null;
    }
-
-   /**
-    * Implementation takes the current screen configuration and loads the {@link ICanvasAppli}s of the App with the saved tech and positions.
-    * <br>
-    * 
-    * <li> When implementation does not support multi screen, 
-    * <li> When no state is present
-    * 
-    * 
-    * @returns false, if last state could not be found.
-    */
-   protected abstract boolean subLoadLastState();
 
    /**
     * If an apps already runs, destroys it.
@@ -292,6 +282,18 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
    protected abstract void startUIThread();
 
    protected abstract void subExit();
+
+   /**
+    * Implementation takes the current screen configuration and loads the {@link ICanvasAppli}s of the App with the saved tech and positions.
+    * <br>
+    * 
+    * <li> When implementation does not support multi screen, 
+    * <li> When no state is present
+    * 
+    * 
+    * @returns false, if last state could not be found.
+    */
+   protected abstract boolean subLoadLastState();
 
    protected abstract void subPause();
 
@@ -319,10 +321,6 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
 
    private void toStringPrivate(Dctx dc) {
 
-   }
-
-   public boolean isHasStartedInitUI() {
-      return hasStartedInitUI;
    }
 
    //#enddebug

@@ -12,7 +12,7 @@ import pasa.cbentley.framework.core.framework.src4.app.IAppli;
 import pasa.cbentley.framework.core.framework.src4.app.IConfigApp;
 import pasa.cbentley.framework.core.framework.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.framework.src4.engine.CoordinatorAbstract;
-import pasa.cbentley.framework.coreui.src4.interfaces.IWrapperManager;
+import pasa.cbentley.framework.core.ui.src4.interfaces.IWrapperManager;
 
 /**
  * The {@link ILauncherHost} is the first object to be instantiated.
@@ -36,15 +36,6 @@ import pasa.cbentley.framework.coreui.src4.interfaces.IWrapperManager;
  */
 public interface ILauncherHost extends IStringable {
 
-   /**
-    * Create the {@link IConfigApp} for the {@link AppCtx} that is created by 
-    * 
-    * {@link ILauncherHost#startAppli(ICreatorAppli)}
-    * 
-    * @param uc
-    * @return {@link IConfigApp}
-    */
-   public IConfigApp createConfigApp(UCtx uc);
 
    /**
     * The coordinator [second head] for this {@link ILauncherHost}.

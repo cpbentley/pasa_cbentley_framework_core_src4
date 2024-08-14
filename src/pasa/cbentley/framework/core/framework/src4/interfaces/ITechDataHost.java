@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.core.framework.src4.interfaces;
 
 import pasa.cbentley.core.src4.interfaces.ITech;
-import pasa.cbentley.framework.coreui.src4.event.GestureArea;
+import pasa.cbentley.framework.core.ui.src4.event.GestureArea;
 
 public interface ITechDataHost extends ITech {
 

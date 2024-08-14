@@ -1,7 +1,7 @@
 package pasa.cbentley.framework.core.framework.src4.app;
 
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
-import pasa.cbentley.framework.coredata.src4.stator.StatorCoreData;
+import pasa.cbentley.framework.core.data.src4.stator.StatorCoreData;
 
 /**
  * Stores user related settings. Shareable between midlets and applications. (this user de

@@ -2,15 +2,15 @@ package pasa.cbentley.framework.core.framework.src4.interfaces;
 
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.IStringable;
+import pasa.cbentley.framework.core.data.src4.ctx.CoreDataCtx;
 import pasa.cbentley.framework.core.framework.src4.app.AppCtx;
 import pasa.cbentley.framework.core.framework.src4.app.AppliAbstract;
 import pasa.cbentley.framework.core.framework.src4.app.IAppli;
 import pasa.cbentley.framework.core.framework.src4.app.IConfigApp;
 import pasa.cbentley.framework.core.framework.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.io.src4.ctx.CoreIOCtx;
-import pasa.cbentley.framework.coredata.src4.ctx.CoreDataCtx;
+import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
-import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
 
 /**
  * 

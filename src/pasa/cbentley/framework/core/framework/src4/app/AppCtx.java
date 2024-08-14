@@ -14,18 +14,18 @@ import pasa.cbentley.core.src4.interfaces.IHostService;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.stator.IStatorFactory;
 import pasa.cbentley.core.src4.thread.WorkerThread;
+import pasa.cbentley.framework.core.data.src4.ctx.CoreDataCtx;
 import pasa.cbentley.framework.core.framework.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.framework.src4.ctx.IBOTypesCoreFramework;
 import pasa.cbentley.framework.core.framework.src4.engine.CoordinatorAbstract;
 import pasa.cbentley.framework.core.framework.src4.i8n.StringProducerBasic;
 import pasa.cbentley.framework.core.framework.src4.interfaces.ILauncherHost;
 import pasa.cbentley.framework.core.io.src4.ctx.CoreIOCtx;
-import pasa.cbentley.framework.coredata.src4.ctx.CoreDataCtx;
+import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
+import pasa.cbentley.framework.core.ui.src4.ctx.IBOCtxSettingsCoreUi;
 import pasa.cbentley.framework.coredraw.src4.ctx.CoreDrawCtx;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IFontFactory;
 import pasa.cbentley.framework.coredraw.src4.interfaces.IImageFactory;
-import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
-import pasa.cbentley.framework.coreui.src4.ctx.IBOCtxSettingsCoreUi;
 
 /**
  * Stub context for applications that want to live and die inside the {@link CoreFrameworkCtx}

@@ -7,7 +7,7 @@ import pasa.cbentley.framework.core.framework.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.framework.src4.ctx.IBOTypesCoreFramework;
 import pasa.cbentley.framework.core.framework.src4.ctx.ObjectCFC;
 import pasa.cbentley.framework.core.framework.src4.interfaces.IBOHost;
-import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
+import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
 
 public abstract class CoreHostAbstract extends ObjectCFC implements IBOHost, IStringable {
 

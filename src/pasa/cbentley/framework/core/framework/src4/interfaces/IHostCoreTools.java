@@ -2,8 +2,8 @@ package pasa.cbentley.framework.core.framework.src4.interfaces;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.framework.core.io.src4.file.IFileConnection;
-import pasa.cbentley.framework.coreui.src4.ctx.CoreUiCtx;
-import pasa.cbentley.framework.coreui.src4.interfaces.ICanvasHost;
+import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
+import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasHost;
 
 /**
  * Interface to control the tools provided by the host
