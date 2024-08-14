@@ -84,9 +84,7 @@ public interface ILauncherHost extends IStringable {
    public void appPause();
 
    /**
-    * Called by {@link CoordinatorAbstract} for launcher to set
-    * 
-    * Like linking os specific services with 
+    * Called by {@link CoordinatorAbstract} on the {@link ILauncherHost}to set os specific services. 
     * 
     * <p>
     * {@link ApiManager#setAPIService(int, Object, ACtx)}

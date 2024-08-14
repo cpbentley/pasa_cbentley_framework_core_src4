@@ -156,6 +156,9 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
 
       //host knows how to clean exit app, depending on wrapper context
       launcherHost.appExit();
+      
+      //set app to null so coordinator may start it again
+      app = null;
    }
 
    public void frameworkPause() {
@@ -170,7 +173,13 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
     * Restart the app
     */
    public void frameworkRestart() {
-      frameworkStart(launcherAppli);
+      if (app != null) {
+         throw new IllegalStateException("App is not null. Cannot restart as the App was not stopped.");
+      }
+      if(launcherAppli == null) {
+         throw new IllegalStateException("Cannot restart as the App was not started at least once.");
+      }
+      startUIThread();
    }
 
    public void frameworkResume() {
@@ -190,6 +199,9 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
       if (app != null) {
          throw new IllegalStateException("A Coordinator is a one time use for a single Appli. Create another coordinator");
          //app.amsDestroyApp();
+      }
+      if(this.launcherAppli != null) {
+         throw new IllegalStateException("Cannot start an App twice. Use restart.");
       }
       //link os specifics to the driver from the launcher
       launcherHost.setOSSpecifics(cfc);

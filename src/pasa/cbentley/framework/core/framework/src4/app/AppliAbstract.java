@@ -648,7 +648,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
          
          canvasHost.titleIconComesticUpdate();
          //#debug
-         toDLog().pFlow("Creating default canvas with title=" + title + " icon=" + icon + " from ConfigApp", this, AppliAbstract.class, "showCanvasDefault", LVL_05_FINE, true);
+         toDLog().pFlow("Creating default canvas with title=" + title + " icon=" + icon + " from ConfigApp", this, AppliAbstract.class, "showCanvasDefault@651", LVL_05_FINE, true);
          //the host implementation of canvas knows what is possible for a default position
          canvasHost.setDefaultStartPosition();
       }
