@@ -22,6 +22,10 @@ public class ObjectCFC implements IStringable {
       return cfc;
    }
    
+   public UCtx getUC() {
+      return cfc.getUC();
+   }
+   
    //#mdebug
    public IDLog toDLog() {
       return toStringGetUCtx().toDLog();

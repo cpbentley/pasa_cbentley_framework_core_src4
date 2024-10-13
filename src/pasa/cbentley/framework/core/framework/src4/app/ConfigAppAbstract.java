@@ -7,7 +7,6 @@ import pasa.cbentley.framework.coredraw.src4.interfaces.ITechGraphics;
 
 public abstract class ConfigAppAbstract extends ConfigAbstractBO implements IConfigApp {
 
-   protected int          aliasMode;
 
    protected String       appIcon;
 
@@ -30,16 +29,12 @@ public abstract class ConfigAppAbstract extends ConfigAbstractBO implements ICon
       super(uc);
       this.name = name;
       isVolatile = false; //by default
-      aliasMode = ITechGraphics.MODSET_APP_ALIAS_0_BEST;
    }
 
    protected void cloneMeSet(ConfigAppAbstract config) {
       config.isVolatile = this.isVolatile;
    }
 
-   public int getAliasMode() {
-      return aliasMode;
-   }
 
    public String getAppIcon() {
       return appIcon;
@@ -79,11 +74,12 @@ public abstract class ConfigAppAbstract extends ConfigAbstractBO implements ICon
       toStringPrivate(dc);
       super.toString(dc.sup());
 
+      dc.appendVarWithNewLine("name", name);
       dc.appendVarWithNewLine("isAppStatorRead", isAppStatorRead);
-      dc.appendVarWithSpace("isAppStatorWrite", isAppStatorWrite);
-      dc.appendVarWithSpace("isVolatile", isVolatile);
+      dc.appendVarWithNewLine("isAppStatorWrite", isAppStatorWrite);
+      dc.appendVarWithNewLine("isVolatile", isVolatile);
 
-      dc.appendVarWithNewLine("aliasMode", aliasMode);
+      dc.appendVarWithNewLine("appIcon", appIcon);
 
    }
 
@@ -95,7 +91,6 @@ public abstract class ConfigAppAbstract extends ConfigAbstractBO implements ICon
 
    private void toStringPrivate(Dctx dc) {
       dc.appendVarWithSpace("name", name);
-
    }
 
    //#enddebug

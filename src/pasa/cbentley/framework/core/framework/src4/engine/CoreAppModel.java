@@ -21,32 +21,33 @@ public class CoreAppModel extends ObjectCFC implements IStatorOwner {
    }
 
    public void stateOwnerRead(Stator stator) {
+      //#debug
+      toDLog().pStator("", stator, CoreAppModel.class, "stateOwnerRead@25", LVL_04_FINER, true);
+      
       StatorReader state = (StatorReader) stator.getReader(ITechStatorBO.TYPE_2_MODEL);
 
       //save stuff here when u add some
-      
+
       stateReadFromSub(state);
    }
 
    public void stateOwnerWrite(Stator stator) {
+      //#debug
+      toDLog().pStator("Writing", stator, CoreAppModel.class, "stateOwnerWrite@33", LVL_04_FINER, true);
       
       StatorWriter w = (StatorWriter) stator.getWriter(ITechStatorBO.TYPE_2_MODEL);
-      
+
       //save stuff here when u add some
-      
-      
+
       stateWriteToSub(w);
    }
-
 
    protected void stateReadFromSub(StatorReader state) {
 
    }
 
-
-
    protected void stateWriteToSub(StatorWriter state) {
-      
+
    }
 
    //#mdebug

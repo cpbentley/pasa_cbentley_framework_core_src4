@@ -14,6 +14,7 @@ import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.IStaticIDs;
 import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.i8n.IStringsKernel;
+import pasa.cbentley.core.src4.interfaces.IExecutor;
 import pasa.cbentley.core.src4.interfaces.IHost;
 import pasa.cbentley.core.src4.interfaces.IHostFeature;
 import pasa.cbentley.core.src4.interfaces.ITimeCtrl;
@@ -70,12 +71,12 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
    protected final ILauncherHost launcher;
 
    /**
-    * 
-    * @param config
+    * 5 Dependencies:
+    * @param config {@link IConfigCoreFramework}
     * @param cuc
     * @param dac
     * @param ioc
-    * @param launcher the {@link ILauncherHost} that creates this {@link CoreFrameworkCtx}
+    * @param launcher {@link ILauncherHost} that creates this {@link CoreFrameworkCtx}
     */
    public CoreFrameworkCtx(IConfigCoreFramework config, CoreUiCtx cuc, CoreDataCtx dac, CoreIOCtx ioc, ILauncherHost launcher) {
       super(config, cuc.getBOC());
@@ -140,11 +141,19 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
       return configCoreFramework;
    }
 
+   /**
+    * 
+    * @return
+    */
    public CoordinatorAbstract getCoordinator() {
       return launcher.getCoordinator();
    }
 
    public CoreDataCtx getCoreDataCtx() {
+      return dac;
+   }
+
+   public CoreDataCtx getDAC() {
       return dac;
    }
 
@@ -154,6 +163,10 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
 
    public ICtx[] getCtxSub() {
       return new ICtx[] { cuc, ioc, dac };
+   }
+
+   public IExecutor getExecutor() {
+      return getHost().getExecutor();
    }
 
    public CoreUiCtx getCUC() {
@@ -272,7 +285,6 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
     * @return
     */
    public abstract String getStringIDReal();
-
 
    protected void matchConfig(IConfigBO config, ByteObject settings) {
 

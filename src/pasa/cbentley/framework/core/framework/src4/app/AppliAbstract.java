@@ -1,7 +1,6 @@
 package pasa.cbentley.framework.core.framework.src4.app;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.stator.ITechStatorBO;
 import pasa.cbentley.core.src4.ctx.CtxManager;
 import pasa.cbentley.core.src4.ctx.IConfigU;
 import pasa.cbentley.core.src4.ctx.ICtx;
@@ -10,13 +9,10 @@ import pasa.cbentley.core.src4.i8n.LocaleID;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.stator.IStatorOwner;
 import pasa.cbentley.core.src4.stator.Stator;
-import pasa.cbentley.core.src4.stator.StatorReader;
-import pasa.cbentley.core.src4.stator.StatorWriter;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.DateUtils;
 import pasa.cbentley.framework.core.data.src4.db.IByteStore;
 import pasa.cbentley.framework.core.data.src4.stator.StatorCoreData;
-import pasa.cbentley.framework.core.data.src4.stator.StatorReaderCoreData;
 import pasa.cbentley.framework.core.framework.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.framework.src4.ctx.IEventsCoreFramework;
 import pasa.cbentley.framework.core.framework.src4.ctx.ObjectCFC;
@@ -27,10 +23,11 @@ import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.core.ui.src4.engine.CanvasAppliAbstract;
 import pasa.cbentley.framework.core.ui.src4.engine.CanvasHostAbstract;
 import pasa.cbentley.framework.core.ui.src4.event.AppliEvent;
-import pasa.cbentley.framework.core.ui.src4.event.BEvent;
+import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
 import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasAppli;
 import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasHost;
-import pasa.cbentley.framework.core.ui.src4.interfaces.ITechEventHost;
+import pasa.cbentley.framework.core.ui.src4.interfaces.ITechEventApp;
+import pasa.cbentley.framework.core.ui.src4.tech.ITechFeaturesCanvas;
 
 /**
  * Base implementation of {@link IAppli}.
@@ -47,7 +44,8 @@ import pasa.cbentley.framework.core.ui.src4.interfaces.ITechEventHost;
  * it may asks the host to display it into a new independant window because the 2 views
  * cooperate with each other. On a small phone screen that is not possible.
  * <br>
- * The container calls the {@link System#exit(int)} method only 
+ * The container calls the {@link System#exit(int)} method only.
+ * 
  * @author Charles Bentley
  *
  */
@@ -60,6 +58,8 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    private CoreAppModel    coreAppModel;
 
    private CoreAppView     coreAppView;
+
+   private LifeContext     lifeContext;
 
    /**
     * Application that spawned this instance. 
@@ -81,15 +81,23 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
 
    private int             state;
 
-   private StatorCoreData  stator;
+   StatorCoreData          stator;
 
-   private LifeContext lifeContext;
+   private CommanderApp    commander;
 
    public AppliAbstract(AppCtx apc) {
       super(apc.getCFC());
       this.apc = apc;
       state = STATE_0_CREATED;
       lifeContext = new LifeContext(apc);
+      commander = new CommanderApp(this);
+      //#debug
+      toDLog().pCreate("", this, AppliAbstract.class, "Created@95", LVL_03_FINEST, true);
+
+   }
+
+   public CommanderApp getCommander() {
+      return commander;
    }
 
    public void amsAppExit() {
@@ -100,7 +108,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       state = STATE_4_DESTROYED;
 
       apc.getUC().getApiManager().lifeStopped(lifeContext);
-      
+
       try {
          IConfigApp configApp = apc.getConfigApp();
          if (configApp.isAppStatorWrite()) {
@@ -122,7 +130,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
     */
    protected void amsAppExitWriteStator() {
       //#debug
-      toDLog().pFlow("Writing State From Disk", this, AppliAbstract.class, "amsAppExitWriteStator@116", LVL_05_FINE, true);
+      toDLog().pStator("Writing State From Disk", this, AppliAbstract.class, "amsAppExitWriteStator@129", LVL_05_FINE, true);
 
       //modules outside the app have static settings. This is now all those objects are saved
       StatorCoreData stator = getStator();
@@ -135,7 +143,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       stator.serializeToStore();
 
       //#debug
-      toDLog().pData("Stator Written", stator, AppliAbstract.class, "amsAppExitWriteStator@124", LVL_05_FINE, false);
+      toDLog().pStator("Stator Written", stator, AppliAbstract.class, "amsAppExitWriteStator@124", LVL_05_FINE, false);
    }
 
    /**
@@ -161,44 +169,42 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
     */
    protected void amsAppLoadStator() {
       //#debug
-      toDLog().pFlow("Reading State From Disk", this, AppliAbstract.class, "amsAppLoadStator@150", LVL_05_FINE, true);
+      toDLog().pStator("Reading State From Disk", this, AppliAbstract.class, "amsAppLoadStator@150", LVL_05_FINE, true);
 
       StatorCoreData stator = null;
       IConfigU configU = apc.getUC().getConfigU();
-      if (configU.isStatorRead()) {
+      IConfigApp configApp = apc.getConfigApp();
+      if (configApp.isAppStatorRead()) {
          stator = getStator();
          CtxManager ctxManager = cfc.getUC().getCtxManager();
          ctxManager.stateOwnerRead(stator);
       } else {
          //#debug
-         toDLog().pFlow("IConfigU#isStatorRead returns false. Does not read settings from disk", configU, AppliAbstract.class, "amsAppLoadStator@147", LVL_05_FINE, true);
+         toDLog().pStator("IConfigU#isStatorRead returns false. Does not read settings from disk", configU, AppliAbstract.class, "amsAppLoadStator@147", LVL_05_FINE, true);
 
       }
 
       //in call stator cases. this method must be called
       subAppLoadPostCtxSettings();
 
-      IConfigApp configApp = apc.getConfigApp();
       if (configApp.isAppStatorRead()) {
          //#debug
-         toDLog().pFlow("isAppStatorRead returns true. Reading settings from disk", configApp, AppliAbstract.class, "amsAppLoadStator@147", LVL_05_FINE, true);
+         toDLog().pStator("isAppStatorRead returns true. Reading settings from disk", configApp, AppliAbstract.class, "amsAppLoadStator@147", LVL_05_FINE, true);
 
          if (stator != null) {
             this.stateOwnerRead(stator);
-            
-            
+
             amsAppLoadStatorCheckFail(stator);
-            
+
          } else {
             //#debug
-            toDLog().pFlow("Stator is null because of  IConfigU", configU, AppliAbstract.class, "amsAppLoadStator@147", LVL_05_FINE, true);
+            toDLog().pStator("Stator is null because of  IConfigU", configU, AppliAbstract.class, "amsAppLoadStator@147", LVL_05_FINE, true);
          }
       } else {
          //#debug
-         toDLog().pFlow("isAppStatorRead returns false. Does not read settings from disk", configApp, AppliAbstract.class, "amsAppLoad@147", LVL_05_FINE, true);
+         toDLog().pStator("isAppStatorRead returns false. Does not read settings from disk", configApp, AppliAbstract.class, "amsAppLoad@147", LVL_05_FINE, true);
 
       }
-
 
    }
 
@@ -221,20 +227,14 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       }
    }
 
-   /**
-    * Called after the reading of code ctx saved state and before application saved ctx state.. 
-    */
-   protected abstract void subAppLoadPostCtxSettings();
-
    public void amsAppPause() {
       if (state != STATE_2_STARTED) {
          throwExceptionBadState("Pause");
       }
 
       apc.getUC().getApiManager().lifePaused(lifeContext);
-      
-      //launch an event in the GUI thread. here we are in the application thread
-      AppliEvent ae = new AppliEvent(getCUC(), ITechEventHost.ACTION_8_APPLI_PAUSED);
+
+      AppliEvent ae = new AppliEvent(getCUC(), ITechEventApp.ACTION_02_APPLI_PAUSED);
       ae.setEventID(IEventsCoreFramework.PID_01_LIFE_02_APP_PAUSED);
       getCUC().publishEventOnAllCanvas(ae);
 
@@ -252,11 +252,15 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       }
       int incr = DateUtils.getMinutes(pauseTime, System.currentTimeMillis());
       apc.getBOCtxSettings().increment(IBOCtxSettingsAppli.CTX_APP_OFFSET_06_STAND_BY_TIME4, 4, incr);
-      
+
       apc.getUC().getApiManager().lifeResumed(lifeContext);
-      
-      
-      subAppUnPaused();
+
+      AppliEvent ae = new AppliEvent(getCUC(), ITechEventApp.ACTION_03_APPLI_RESUMED);
+      //send it on the bus ?
+      ae.setEventID(IEventsCoreFramework.PID_01_LIFE_03_APP_RESUMED);
+      getCUC().publishEventOnAllCanvas(ae);
+
+      subAppResumed();
       state = STATE_2_STARTED;
    }
 
@@ -359,24 +363,6 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    }
 
    /**
-    * 
-    */
-   public void cmdToggleAlias() {
-      ByteObject appliTech = getCtxSettingsAppli();
-      int val = appliTech.get1(IBOCtxSettingsAppli.CTX_APP_OFFSET_08_ANTI_ALIAS1);
-      if (val == IBOCtxSettingsAppli.CTX_APP_ALIAS_2_OFF) {
-         val = IBOCtxSettingsAppli.CTX_APP_ALIAS_1_ON;
-      } else {
-         val = IBOCtxSettingsAppli.CTX_APP_ALIAS_2_OFF;
-      }
-      appliTech.set1(IBOCtxSettingsAppli.CTX_APP_OFFSET_08_ANTI_ALIAS1, val);
-
-      //appli tech changed.. apply them to each canvas ?
-
-      CanvasHostAbstract[] canvases = apc.getCFC().getCUC().getCanvases();
-   }
-
-   /**
     * When Application extends {@link CoreAppModel}, it also has to override this method
     * @return
     */
@@ -394,6 +380,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       return coreAppView;
    }
 
+   public abstract ICanvasAppli createCanvas(int id, ByteObject boCanvasHost, Object params);
 
    public IAppli getApp() {
       return apc.getAppli();
@@ -403,12 +390,19 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       return apc;
    }
 
+   /**
+    * {@link IBOCtxSettingsAppli#CTX_APP_OFFSET_04_STARTS2}
+    * @return
+    */
+   public int getBONumStarts() {
+      ByteObject bo = getCtxSettingsAppli();
+      return bo.get2(IBOCtxSettingsAppli.CTX_APP_OFFSET_04_STARTS2);
+   }
+
    protected IByteStore getByteStore() {
       IByteStore bs = apc.getCFC().getCoreDataCtx().getByteStore();
       return bs;
    }
-
-   public abstract ICanvasAppli createCanvas(int id, ByteObject boCanvasHost, Object params);
 
    public ICanvasAppli getCanvas(int id) {
       ICanvasHost ch = apc.getCUC().getCanvasFromID(id);
@@ -416,10 +410,6 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
          return ch.getCanvasAppli();
       }
       return null;
-   }
-
-   public CoreUiCtx getCUC() {
-      return apc.getCUC();
    }
 
    /**
@@ -462,6 +452,10 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
     */
    public ByteObject getCtxSettingsAppli() {
       return apc.getBOCtxSettings();
+   }
+
+   public CoreUiCtx getCUC() {
+      return apc.getCUC();
    }
 
    /**
@@ -529,15 +523,6 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    }
 
    /**
-    * {@link IBOCtxSettingsAppli#CTX_APP_OFFSET_04_STARTS2}
-    * @return
-    */
-   public int getBONumStarts() {
-      ByteObject bo = getCtxSettingsAppli();
-      return bo.get2(IBOCtxSettingsAppli.CTX_APP_OFFSET_04_STARTS2);
-   }
-
-   /**
     * {@link IBOProfileApp#PROFILE_OFFSET_08_NAME15} 
     * @return
     */
@@ -555,12 +540,6 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
     */
    public int getState() {
       return state;
-   }
-
-   public String getStatorName() {
-      IConfigApp configApp = apc.getConfigApp();
-      String storeName = configApp.getAppName();
-      return storeName + getProfileString();
    }
 
    /**
@@ -585,17 +564,14 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
       return stator;
    }
 
-   /**
-    * Delete exsiting settings data on disk 
-    */
-   public void deleteStatorData() {
-      getStator().deleteDataAll();
-      stator = null;
-      apc.getUC().getCtxManager().deleteStartData();
+   public String getStatorName() {
+      IConfigApp configApp = apc.getConfigApp();
+      String storeName = configApp.getAppName();
+      return storeName + getProfileString();
    }
 
    /**
-    * Returns true when the container is not chained to another
+    * Returns true when the Application is not controlled by another {@link IAppli}.
     * @return
     */
    public boolean isMaster() {
@@ -608,13 +584,6 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
 
    public void notifyPaused() {
       apc.getCoordinator().appliWantBePaused();
-   }
-
-   /**
-    * Each modules save its state in a predictable manner
-    * @param ms
-    */
-   public void saveState() {
    }
 
    /**
@@ -637,7 +606,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
          //load the default canvas
          ICanvasAppli canvas = createCanvas(0, null, null);
          IConfigApp configApp = apc.getConfigApp();
-         
+
          String title = configApp.getAppName();
          String icon = configApp.getAppIcon();
 
@@ -645,12 +614,12 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
          canvas.setIcon(icon);
 
          ICanvasHost canvasHost = canvas.getCanvasHost();
-         
+
          canvasHost.titleIconComesticUpdate();
          //#debug
          toDLog().pFlow("Creating default canvas with title=" + title + " icon=" + icon + " from ConfigApp", this, AppliAbstract.class, "showCanvasDefault@651", LVL_05_FINE, true);
          //the host implementation of canvas knows what is possible for a default position
-         canvasHost.setDefaultStartPosition();
+         canvasHost.setStartPositionAndSize();
       }
 
       //show the canvases, either from state or from new
@@ -704,6 +673,11 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    protected abstract void subAppLoad();
 
    /**
+    * Called after the reading of code ctx saved state and before application saved ctx state.. 
+    */
+   protected abstract void subAppLoadPostCtxSettings();
+
+   /**
     * Convention is that sub prefixed methods are abstract and don't have to be called
     */
    protected abstract void subAppPause();
@@ -720,9 +694,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    /**
     * 
     */
-   protected void subAppUnPaused() {
-
-   }
+   protected abstract void subAppResumed();
 
    /**
     * When the App is launched for the first time with a new code version.

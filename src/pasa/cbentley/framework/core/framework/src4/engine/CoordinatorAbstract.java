@@ -15,26 +15,31 @@ import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasAppli;
 
 /**
  * 
- * Coordinate the life cycle the {@link IAppli} to the {@link ILauncherHost}.
+ * Coordinates the life cycle the {@link IAppli} to the {@link ILauncherHost}. 
  * 
  * <p>
+ * The constructor {@link CoordinatorAbstract#CoordinatorAbstract(CoreFrameworkCtx, ILauncherHost)} shows that it is created by the {@link ILauncherHost}.
+ * </p>
  * 
- * The {@link CoordinatorAbstract} implementation is the appendice of the {@link ILauncherHost}
- * 
- * One to zero/one relation between {@link CoordinatorAbstract} and {@link IAppli}
+ * <p>
+ * There is a <b>One</b> to [<b>One</b> or <b>Zero</b>] relation between {@link CoordinatorAbstract} and {@link IAppli}
  * </p>
  * 
  * <li> Start them in the correct order
  * <li> The coordinator is used by the host canvas to interact stop/pause/start the application.
+ * <li> The host implemention knows how to call the UI thread coordinator is used by the host canvas to interact stop/pause/start the application.
  * 
  * <p>
  * 
  * The Host is created before the application instance.
- * 
- * Because Android/J2ME launchers must extend a specific classes, we cannot have multiple inheritance
- * 
  * This class is that second head to the launcher. Its the primary API used by the Bentley framework.
  * </p>
+ * 
+ * <p>
+ * The Coordinator construct was designed because some with Hosts like Android or J2ME, the launchers must extend a specific classes such as Activity or MIDlet.
+ * In Java we cannot have multiple inheritance and we shall strive to avoid inheritance because the isA relationship is hard and constraining.
+ * </p>
+ * 
  * 
  * <p>
  * 
@@ -81,6 +86,9 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
    protected CoordinatorAbstract(CoreFrameworkCtx cfc, ILauncherHost launcherHost) {
       super(cfc);
       this.launcherHost = launcherHost;
+      
+      //#debug
+      toDLog().pCreate("", this, CoordinatorAbstract.class, "Created@86", LVL_03_FINEST, true);
    }
 
    /**
@@ -184,10 +192,9 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
 
    public void frameworkResume() {
       if (app != null) {
-         app.amsAppStart();
+         app.amsAppResume();
       }
       subResume();
-      launcherHost.appPause();
    }
 
    /**
@@ -248,7 +255,7 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
       app.amsAppStart();
 
       //#debug
-      toDLog().pFlow("", this, CoordinatorAbstract.class, "initUIThreadInside@line218", LVL_05_FINE, true);
+      toDLog().pFlow("", this, CoordinatorAbstract.class, "initUIThreadInside@218", LVL_05_FINE, true);
 
       if (cfc.getCUC().getCanvasRootHost() == null) {
          //headless mode no canvas

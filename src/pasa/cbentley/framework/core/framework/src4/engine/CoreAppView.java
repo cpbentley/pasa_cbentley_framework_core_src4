@@ -1,7 +1,5 @@
 package pasa.cbentley.framework.core.framework.src4.engine;
 
-import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.stator.ITechStatorBO;
 import pasa.cbentley.byteobjects.src4.stator.StatorReaderBO;
 import pasa.cbentley.byteobjects.src4.stator.StatorWriterBO;
@@ -11,22 +9,12 @@ import pasa.cbentley.core.src4.stator.ITechStator;
 import pasa.cbentley.core.src4.stator.Stator;
 import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
-import pasa.cbentley.core.src4.structs.IntToObjects;
-import pasa.cbentley.framework.core.data.src4.stator.StatorCoreData;
-import pasa.cbentley.framework.core.data.src4.stator.StatorReaderCoreData;
-import pasa.cbentley.framework.core.data.src4.stator.StatorWriterCoreData;
-import pasa.cbentley.framework.core.framework.src4.app.AppliAbstract;
 import pasa.cbentley.framework.core.framework.src4.app.IAppli;
 import pasa.cbentley.framework.core.framework.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.framework.src4.ctx.ObjectCFC;
-import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
-import pasa.cbentley.framework.core.ui.src4.ctx.IBOTypesCoreUi;
 import pasa.cbentley.framework.core.ui.src4.engine.CanvasAppliAbstract;
 import pasa.cbentley.framework.core.ui.src4.engine.CanvasHostAbstract;
 import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasAppli;
-import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasHost;
-import pasa.cbentley.framework.core.ui.src4.tech.IBOCanvasHost;
-import pasa.cbentley.framework.core.ui.src4.tech.IBOFramePos;
 
 /**
  * 
@@ -39,19 +27,6 @@ public class CoreAppView extends ObjectCFC implements IStatorOwner {
       super(cfc);
    }
 
-   public void stateOwnerRead(Stator stator) {
-      StatorReaderBO state = (StatorReaderBO) stator.getReader(ITechStatorBO.TYPE_1_VIEW);
-
-      if (state == null) {
-         return;
-      }
-
-      //save stuff here when u add some
-      stateOwnerCanvasHostsReading(state);
-
-      stateReadFromSub(state);
-   }
-
    private void stateOwnerCanvasHostsReading(StatorReaderBO statorReader) {
       //is the ui state driving the model? or is the model state driving the ui state ?
       //in single screen, ui state/model state always match
@@ -62,10 +37,10 @@ public class CoreAppView extends ObjectCFC implements IStatorOwner {
 
       try {
          //read the different available
-         int numCanvases = statorReader.readInt();
+         int numCanvases = statorReader.dataReadInt();
 
          //#debug
-         toDLog().pInit("Reading state for " + numCanvases + " canvas", null, CoreAppView.class, "stateOwnerCanvasHostsReading", LVL_05_FINE, true);
+         toDLog().pStator("Reading state for " + numCanvases + " canvas", null, CoreAppView.class, "stateOwnerCanvasHostsReading", LVL_05_FINE, true);
 
          for (int i = 0; i < numCanvases; i++) {
 
@@ -74,11 +49,11 @@ public class CoreAppView extends ObjectCFC implements IStatorOwner {
             //            //#debug
             //            techCanvasHost.checkType(IBOTypesCoreUI.TYPE_5_TECH_CANVAS_HOST);
 
-            statorReader.checkInt(123456);
-            CanvasAppliAbstract canvasAppli = (CanvasAppliAbstract) statorReader.readObject();
+            statorReader.checkInt(ITechStator.MAGIC_WORD_SEPARATOR);
+            CanvasAppliAbstract canvasAppli = (CanvasAppliAbstract) statorReader.dataReadObject();
 
             //#debug
-            toDLog().pInit("UnWrapped", canvasAppli, CoreAppView.class, "stateOwnerCanvasHostsReading@82", LVL_05_FINE, true);
+            toDLog().pStator("UnWrapped", canvasAppli, CoreAppView.class, "stateOwnerCanvasHostsReading@82", LVL_05_FINE, true);
             //statorReader.readerToStatorable(canvasAppli);
 
          }
@@ -114,15 +89,31 @@ public class CoreAppView extends ObjectCFC implements IStatorOwner {
             //            boCanvas.checkType(IBOTypesCoreUI.TYPE_5_TECH_CANVAS_HOST);
             //            statorWriter.writeByteObject(boCanvas);
 
-            statorWriter.getWriter().writeInt(123456);
+            statorWriter.getWriter().writeInt(ITechStator.MAGIC_WORD_SEPARATOR);
             ICanvasAppli canvasAppli = ch.getCanvasAppli();
-            statorWriter.writerToStatorable(canvasAppli);
+            statorWriter.dataWriterToStatorable(canvasAppli);
          }
       } catch (Exception e) {
          e.printStackTrace();
          statorWriter.setFlag(ITechStatorBO.FLAG_1_FAILED, true);
       }
 
+   }
+
+   public void stateOwnerRead(Stator stator) {
+      //#debug
+      toDLog().pStator("Reading..", stator, CoreAppView.class, "stateOwnerRead@44", LVL_04_FINER, true);
+
+      StatorReaderBO state = (StatorReaderBO) stator.getReader(ITechStatorBO.TYPE_1_VIEW);
+
+      if (state == null) {
+         return;
+      }
+
+      //save stuff here when u add some
+      stateOwnerCanvasHostsReading(state);
+
+      stateReadFromSub(state);
    }
 
    public void stateOwnerWrite(Stator stator) {

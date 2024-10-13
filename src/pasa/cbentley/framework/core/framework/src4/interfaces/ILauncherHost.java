@@ -4,12 +4,9 @@ import pasa.cbentley.core.src4.api.ApiManager;
 import pasa.cbentley.core.src4.ctx.ACtx;
 import pasa.cbentley.core.src4.ctx.CtxManager;
 import pasa.cbentley.core.src4.ctx.ICtx;
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.ILogConfigurator;
 import pasa.cbentley.core.src4.logging.IStringable;
-import pasa.cbentley.framework.core.framework.src4.app.AppCtx;
 import pasa.cbentley.framework.core.framework.src4.app.IAppli;
-import pasa.cbentley.framework.core.framework.src4.app.IConfigApp;
 import pasa.cbentley.framework.core.framework.src4.ctx.CoreFrameworkCtx;
 import pasa.cbentley.framework.core.framework.src4.engine.CoordinatorAbstract;
 import pasa.cbentley.framework.core.ui.src4.interfaces.IWrapperManager;
@@ -36,6 +33,27 @@ import pasa.cbentley.framework.core.ui.src4.interfaces.IWrapperManager;
  */
 public interface ILauncherHost extends IStringable {
 
+   /**
+    * Called by {@link CoordinatorAbstract} when application exits.
+    * 
+    * Launcher gets a chance to clean its own things up.
+    */
+   public void appExit();
+
+   /**
+    * Called by {@link CoordinatorAbstract} when application pauses.
+    * 
+    * Launcher gets a chance to pause its own things up.
+    */
+   public void appPause();
+
+   /**
+    * The {@link CoreFrameworkCtx} for the Host.
+    * 
+    * Owner {@link ICtx} of the {@link ILauncherHost}.
+    * @return
+    */
+   public CoreFrameworkCtx getCFC();
 
    /**
     * The coordinator [second head] for this {@link ILauncherHost}.
@@ -61,29 +79,6 @@ public interface ILauncherHost extends IStringable {
    public IDependencies getDependencies();
 
    /**
-    * Assigns the {@link ICreatorAppli} and creates the {@link IAppli} with the {@link ICreatorAppli#createAppOnFramework(CoreFrameworkCtx)}.
-    * 
-    * @param launcherAppli {@link ICreatorAppli}
-    * @throws IllegalStateException if Launcher has already launched an {@link IAppli}
-    */
-   public void startAppli(ICreatorAppli launcherAppli);
-
-   /**
-    * Called by {@link CoordinatorAbstract} when application exits.
-    * 
-    * Launcher gets a chance to clean its own things up.
-    */
-   public void appExit();
-
-   /**
-    * Called by {@link CoordinatorAbstract} when application exits.
-    * 
-    * Launcher gets a chance to clean its own things up.
-    */
-
-   public void appPause();
-
-   /**
     * Called by {@link CoordinatorAbstract} on the {@link ILauncherHost}to set os specific services. 
     * 
     * <p>
@@ -94,15 +89,15 @@ public interface ILauncherHost extends IStringable {
     * 
     * In Swing, it means its not the Gui thread
     */
-   public void setOSSpecifics(CoreFrameworkCtx hoc);
+   public void setOSSpecifics(CoreFrameworkCtx cfc);
 
    /**
-    * The {@link CoreFrameworkCtx} for the Host.
+    * Assigns the {@link ICreatorAppli} and creates the {@link IAppli} with the {@link ICreatorAppli#createAppOnFramework(CoreFrameworkCtx)}.
     * 
-    * Owner {@link ICtx} of the {@link ILauncherHost}.
-    * @return
+    * @param launcherAppli {@link ICreatorAppli}
+    * @throws IllegalStateException if Launcher has already launched an {@link IAppli}
     */
-   public CoreFrameworkCtx getCFC();
+   public void startAppli(ICreatorAppli launcherAppli);
 
    //#mdebug
    /**

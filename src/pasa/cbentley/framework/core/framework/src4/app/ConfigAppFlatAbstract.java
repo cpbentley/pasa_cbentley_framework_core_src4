@@ -8,6 +8,7 @@ import pasa.cbentley.framework.core.framework.src4.ctx.IConfigCoreFramework;
 import pasa.cbentley.framework.core.io.src4.ctx.IConfigCoreIO;
 import pasa.cbentley.framework.core.ui.src4.ctx.IConfigCoreUi;
 import pasa.cbentley.framework.coredraw.src4.ctx.IConfigCoreDraw;
+import pasa.cbentley.framework.coredraw.src4.interfaces.ITechFont;
 
 /**
  * When we want host configuration to be part of the App configuration
@@ -44,11 +45,22 @@ public abstract class ConfigAppFlatAbstract extends ConfigAppAbstract implements
       return this;
    }
 
+   public int getDefaultFontSize() {
+      return ITechFont.SIZE_3_MEDIUM;
+   }
+
+   public boolean isUsingFontCache() {
+      return true;
+   }
+   
    public IConfigCoreDraw getConfigDraw() {
       return this;
    }
 
-
+   public int getAliasMode() {
+      // TODO Auto-generated method stub
+      return 0;
+   }
    public boolean isFullscreen() {
       // TODO Auto-generated method stub
       return false;

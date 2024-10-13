@@ -31,7 +31,14 @@ public interface IEventsCoreFramework extends IEvents {
 
    public static final int PID_01_LIFE_02_APP_PAUSED  = 2;
 
-   public static final int PID_01_XX                  = 3;
+   public static final int PID_01_LIFE_03_APP_RESUMED = 3;
+
+   public static final int PID_01_LIFE_04_APP_STOPPED = 4;
+
+   /**
+    * Value includes the 0 ANY event
+    */
+   public static final int PID_01_XX                  = 5; 
 
    public static final int PID_02                     = 1;
 

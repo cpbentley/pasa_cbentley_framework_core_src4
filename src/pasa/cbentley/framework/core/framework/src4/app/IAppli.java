@@ -67,25 +67,37 @@ public interface IAppli extends ITechAppli, IStringable {
 
    /**
     * 
+    * <li>{@link ITechAppli#STATE_0_CREATED}
+    * <li>{@link ITechAppli#STATE_1_LOADED}
+    * <li>{@link ITechAppli#STATE_2_STARTED}
+    * <li>{@link ITechAppli#STATE_3_PAUSED}
+    * <li>{@link ITechAppli#STATE_4_DESTROYED}
     * @return
     */
    public int getState();
 
    /**
-    * AMS calls this method when the Application will be closed.
-    * <br>
-    * For closing the App from inside the app, use the method {@link CoordinatorAbstract#appliWantBeDestroyed()}
-    * <br>
-    * Set state to {@link ITechAppli#STATE_4_DESTROYED}.
-    * <br>
-    * the {@link IAppli} must cleanup and release all resources. 
+    * The Application Management System (AMS) calls this method when the {@link IAppli} will be closed.
     * 
+    * <p>
+    * For closing the App from inside the app, use the method {@link CoordinatorAbstract#appliWantBeDestroyed()}
+    * </p>
+    * 
+    * <p>
+    * Set <b>state</b> to {@link ITechAppli#STATE_4_DESTROYED}.
+    * Once this method returns, 
+    * the {@link IAppli} must cleanup and release all resources. 
+    * </p>
+    * <br>
+    * 
+    * <p>
     * This can be called from any state except destroyed
+    * </p>
     */
    public void amsAppExit();
 
    /**
-    * Called by AppModule controller
+    * Called by <b>Application Manager System</b> Module controller.
     * 
     * This lets the app writes state to disk
     * 
@@ -94,7 +106,7 @@ public interface IAppli extends ITechAppli, IStringable {
    public void amsAppPause();
 
    /**
-    * Must be called when state 
+    * Called by the {@link CoordinatorAbstract}.
     * 
     * @throws IllegalStateException when not in {@link ITechAppli#STATE_3_PAUSED} state.
     */
@@ -122,9 +134,12 @@ public interface IAppli extends ITechAppli, IStringable {
    public AppCtx getAppCtx();
 
    /**
-    * Asks the application to create a {@link ICanvasAppli}, usually to meant to be displayed.
+    * Asks the application to create an implementation of {@link ICanvasAppli}.
     * 
+    * <p>
     * When you want to an existing canvas, the {@link IBOCanvasHost} can define it.
+    * 
+    * </p>
     * 
     * A {@link CanvasAppliAbstract} always has a non null {@link CanvasHostAbstract}
     * 
@@ -142,25 +157,31 @@ public interface IAppli extends ITechAppli, IStringable {
     * 
     * Its a bonus for such hosts or specific App for those hosts.
     * 
+    * <p>
     * Can you create a Canvas without using this method ? Directly ?
+    * 
+    * </p>
+    * <p>
+    * 
     * Does this method doing any registering ? I guess so. But then the Canvas has to register with Appli
     * since he has to own the AppCtx, that's easy.
+    * </p>
     * 
     * An {@link ICanvasAppli} implementation belongs to the AppCtx of that application.
     * 
     * @param id creation time. or class ID from the Statorable
-    * @param boCanvasHost when null returns the default canvas for the given id, {@link IBOCanvasHost}
+    * @param boCanvasHost {@link IBOCanvasHost} when null returns the default canvas for the given id, {@link IBOCanvasHost}
     * defining the properties of the canvas.
     * @param params TODO
-    * @return
+    * @return {@link ICanvasAppli}
     */
    public ICanvasAppli createCanvas(int id, ByteObject boCanvasHost, Object params);
 
 
    /**
-    * Returns an existing canvas. null if id is not linked to a Canvas.
+    * Returns an existing canvas. null if id is not linked to an {@link ICanvasAppli}
     * 
-    * When not existing, it has to be fetched using {@link IBOCanvasHost#TCANVAS_OFFSET_03_ID2}
+    * When not existing, it has to be fetched using {@link IBOCanvasHost#CANVAS_HOST_OFFSET_03_ID2}
     * 
     * Single Responsability Principle -> Avoid mixing Get/Create logics
     * @param id

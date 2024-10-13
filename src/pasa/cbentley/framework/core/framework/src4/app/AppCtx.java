@@ -5,7 +5,6 @@ import pasa.cbentley.byteobjects.src4.ctx.ABOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IConfigBO;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.i8n.IStringProducer;
-import pasa.cbentley.core.src4.i8n.IStringsKernel;
 import pasa.cbentley.core.src4.interfaces.IAInitable;
 import pasa.cbentley.core.src4.interfaces.IHost;
 import pasa.cbentley.core.src4.interfaces.IHostData;
@@ -44,16 +43,15 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSetting
 
    protected final IConfigApp       configApp;
 
-   protected final IStringProducer  stringProducer;
+   private IStatorFactory           statorFactory;
 
-   private WorkerThread             workerThread;
+   protected final IStringProducer  stringProducer;
 
    /**
     * Update this field in the constructor when updating to a new version
     */
    protected String                 version = "1.0";
 
-   private IStatorFactory           statorFactory;
 
    public AppCtx(IConfigApp configApp, CoreFrameworkCtx cfc) {
       super(configApp, cfc.getBOC());
@@ -63,33 +61,6 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSetting
       this.configApp = configApp;
       this.cfc = cfc;
       this.stringProducer = new StringProducerBasic(cfc);
-   }
-
-   public IHost getHost() {
-      return cfc.getHost();
-   }
-
-   public IHostData getHostData() {
-      return cfc.getHost().getHostData();
-   }
-
-   public IHostService getHostService() {
-      return cfc.getHost().getHostService();
-   }
-
-   public IHostFeature getHostFeature() {
-      return cfc.getHost().getHostFeature();
-   }
-
-   public void a_Init() {
-      super.a_Init();
-   }
-
-   public IStatorFactory getStatorFactory() {
-      if (statorFactory == null) {
-         statorFactory = new StatorFactoryApp(this);
-      }
-      return statorFactory;
    }
 
    public AppCtx(IConfigApp configApp, CoreFrameworkCtx cfc, IStringProducer stringProducer) {
@@ -102,9 +73,8 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSetting
       this.stringProducer = stringProducer;
    }
 
-   protected void matchConfig(IConfigBO config, ByteObject settings) {
-      IConfigApp configApp = (IConfigApp) config;
-      settings.setFlag(CTX_APP_OFFSET_02_FLAGX, CTX_APP_FLAGX_2_DRAG_DROP, configApp.isAppDragDropEnabled());
+   public void a_Init() {
+      super.a_Init();
    }
 
    /**
@@ -124,37 +94,6 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSetting
       cfc.getCUC().applyChanges(settingsBO);
    }
 
-   public ICtx[] getCtxSub() {
-      return new ICtx[] { cfc };
-   }
-
-   /**
-    * Returns a String of this App version.
-    * 
-    * Used for running updaters
-    * 
-    * @return
-    */
-   public String getVersion() {
-      return version;
-   }
-
-   public IAppli getAppli() {
-      return getCoordinator().getAppli();
-   }
-
-   public int getBOCtxSettingSize() {
-      return IBOCtxSettingsAppli.CTX_APP_BASIC_SIZE;
-   }
-
-   public CoreFrameworkCtx getCFC() {
-      return cfc;
-   }
-
-   public CoreDrawCtx getCDC() {
-      return cfc.getCUC().getCDC();
-   }
-
    /**
     * {@link IBOProfileApp}
     * 
@@ -165,6 +104,22 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSetting
       int size = IBOProfileApp.PROFILE_BASIC_SIZE;
       ByteObject bo = getBOC().getByteObjectFactory().createByteObject(type, size);
       return bo;
+   }
+
+   public IAppli getAppli() {
+      return getCoordinator().getAppli();
+   }
+
+   public int getBOCtxSettingSize() {
+      return IBOCtxSettingsAppli.CTX_APP_BASIC_SIZE;
+   }
+
+   public CoreDrawCtx getCDC() {
+      return cfc.getCUC().getCDC();
+   }
+
+   public CoreFrameworkCtx getCFC() {
+      return cfc;
    }
 
    public IConfigApp getConfigApp() {
@@ -183,12 +138,28 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSetting
       return cfc.getCoreIOCtx();
    }
 
+   public ICtx[] getCtxSub() {
+      return new ICtx[] { cfc };
+   }
+
    public CoreUiCtx getCUC() {
       return cfc.getCUC();
    }
 
    public IFontFactory getFontFactory() {
       return cfc.getCUC().getFontFactory();
+   }
+
+   public IHost getHost() {
+      return cfc.getHost();
+   }
+
+   public IHostData getHostData() {
+      return cfc.getHost().getHostData();
+   }
+
+   public IHostFeature getHostFeature() {
+      return cfc.getHost().getHostFeature();
    }
 
    /**
@@ -201,23 +172,43 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSetting
       return null;
    }
 
+   public IHostService getHostService() {
+      return cfc.getHost().getHostService();
+   }
+
    public IImageFactory getImageFactory() {
       return cfc.getCUC().getImageFactory();
    }
 
-   public IStringProducer getStrings() {
-      return stringProducer;
+   public IStatorFactory getStatorFactory() {
+      if (statorFactory == null) {
+         statorFactory = new StatorFactoryApp(this);
+      }
+      return statorFactory;
    }
 
    public IStringProducer getStringProducer() {
       return stringProducer;
    }
 
-   public WorkerThread getWorkerThreadApp() {
-      if (workerThread == null) {
-         workerThread = new WorkerThread(getUC());
-      }
-      return workerThread;
+   public IStringProducer getStrings() {
+      return stringProducer;
+   }
+
+   /**
+    * Returns a String of this App version.
+    * 
+    * Used for running updaters
+    * 
+    * @return
+    */
+   public String getVersion() {
+      return version;
+   }
+
+   protected void matchConfig(IConfigBO config, ByteObject settings) {
+      IConfigApp configApp = (IConfigApp) config;
+      settings.setFlag(CTX_APP_OFFSET_02_FLAGX, CTX_APP_FLAGX_2_DRAG_DROP, configApp.isAppDragDropEnabled());
    }
 
    //#mdebug
