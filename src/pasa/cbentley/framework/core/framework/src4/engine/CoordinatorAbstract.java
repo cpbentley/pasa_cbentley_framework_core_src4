@@ -207,13 +207,19 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
          throw new IllegalStateException("A Coordinator is a one time use for a single Appli. Create another coordinator");
          //app.amsDestroyApp();
       }
-      if(this.launcherAppli != null) {
-         throw new IllegalStateException("Cannot start an App twice. Use restart.");
+      if(this.launcherAppli == null) {
+         //first time
+         this.launcherAppli = launcherAppli;
+         //asks the launcher to set os specifics
+         launcherHost.setOSSpecifics(cfc);
+         //startUIThread();
+         runStart();
+      } else {
+         runStart();
+         //app was already started... use the restart procedure
+         //startUIThread();
       }
       //link os specifics to the driver from the launcher
-      launcherHost.setOSSpecifics(cfc);
-      this.launcherAppli = launcherAppli;
-      startUIThread();
    }
 
    /**
@@ -283,6 +289,14 @@ public abstract class CoordinatorAbstract extends ObjectCFC implements IStringab
       return app != null;
    }
 
+   public void runStart() {
+      cfc.getExecutor().executeMainNow(new Runnable() {
+         
+         public void run() {
+            initUIThreadInside();
+         }
+      });
+   }
    /**
     * If an apps already runs, destroys it.
     * 

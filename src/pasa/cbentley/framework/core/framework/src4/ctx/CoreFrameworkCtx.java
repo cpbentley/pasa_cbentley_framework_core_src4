@@ -81,6 +81,7 @@ public abstract class CoreFrameworkCtx extends ABOCtx implements IEventsCoreFram
    public CoreFrameworkCtx(IConfigCoreFramework config, CoreUiCtx cuc, CoreDataCtx dac, CoreIOCtx ioc, ILauncherHost launcher) {
       super(config, cuc.getBOC());
       this.configCoreFramework = config;
+
       this.cuc = cuc;
       this.dac = dac;
       this.ioc = ioc;

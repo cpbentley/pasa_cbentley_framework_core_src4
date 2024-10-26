@@ -65,6 +65,8 @@ public interface ICreatorAppli extends IStringable {
     */
    public IAppli createAppOnFramework(CoreFrameworkCtx cfc);
 
+   public IConfigApp getConfigApp();
+
    /**
     * 
     * @return

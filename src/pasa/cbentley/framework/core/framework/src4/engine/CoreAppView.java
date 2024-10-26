@@ -40,7 +40,7 @@ public class CoreAppView extends ObjectCFC implements IStatorOwner {
          int numCanvases = statorReader.dataReadInt();
 
          //#debug
-         toDLog().pStator("Reading state for " + numCanvases + " canvas", null, CoreAppView.class, "stateOwnerCanvasHostsReading", LVL_05_FINE, true);
+         toDLog().pStator("Reading state for " + numCanvases + " canvas", null, CoreAppView.class, "stateOwnerCanvasHostsReading@43", LVL_05_FINE, true);
 
          for (int i = 0; i < numCanvases; i++) {
 
@@ -59,7 +59,7 @@ public class CoreAppView extends ObjectCFC implements IStatorOwner {
          }
       } catch (Exception e) {
          //#debug
-         toDLog().pEx("", this, CoreAppView.class, "stateOwnerCanvasHostsReading", e);
+         toDLog().pEx("", this, CoreAppView.class, "stateOwnerCanvasHostsReading@62", e);
          e.printStackTrace();
          statorReader.setFlag(ITechStatorBO.FLAG_1_FAILED, true);
       }

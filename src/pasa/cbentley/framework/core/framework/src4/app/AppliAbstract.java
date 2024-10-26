@@ -22,7 +22,7 @@ import pasa.cbentley.framework.core.framework.src4.engine.CoreAppView;
 import pasa.cbentley.framework.core.ui.src4.ctx.CoreUiCtx;
 import pasa.cbentley.framework.core.ui.src4.engine.CanvasAppliAbstract;
 import pasa.cbentley.framework.core.ui.src4.engine.CanvasHostAbstract;
-import pasa.cbentley.framework.core.ui.src4.event.AppliEvent;
+import pasa.cbentley.framework.core.ui.src4.event.EventAppli;
 import pasa.cbentley.framework.core.ui.src4.exec.ExecutionContext;
 import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasAppli;
 import pasa.cbentley.framework.core.ui.src4.interfaces.ICanvasHost;
@@ -234,7 +234,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
 
       apc.getUC().getApiManager().lifePaused(lifeContext);
 
-      AppliEvent ae = new AppliEvent(getCUC(), ITechEventApp.ACTION_02_APPLI_PAUSED);
+      EventAppli ae = new EventAppli(getCUC(), ITechEventApp.ACTION_02_APPLI_PAUSED);
       ae.setEventID(IEventsCoreFramework.PID_01_LIFE_02_APP_PAUSED);
       getCUC().publishEventOnAllCanvas(ae);
 
@@ -255,7 +255,7 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
 
       apc.getUC().getApiManager().lifeResumed(lifeContext);
 
-      AppliEvent ae = new AppliEvent(getCUC(), ITechEventApp.ACTION_03_APPLI_RESUMED);
+      EventAppli ae = new EventAppli(getCUC(), ITechEventApp.ACTION_03_APPLI_RESUMED);
       //send it on the bus ?
       ae.setEventID(IEventsCoreFramework.PID_01_LIFE_03_APP_RESUMED);
       getCUC().publishEventOnAllCanvas(ae);
@@ -598,6 +598,9 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
     */
    protected void showCanvasDefault() {
 
+      //#debug
+      toDLog().pFlow("", this, AppliAbstract.class, "showCanvasDefault@602", LVL_05_FINE, true);
+      
       //check if canvas id 0 is load
 
       CoreUiCtx cuc = apc.getCUC();
@@ -683,16 +686,21 @@ public abstract class AppliAbstract extends ObjectCFC implements IAppli, IBOCtxS
    protected abstract void subAppPause();
 
    /**
-    * Hook up for the application.
+    * The application {@link AppliAbstract} starting code has run already. Implementation may start its canvases.
     * 
-    * What should i do here? Application wide initialization after windows have been shown.
+    * <p>
+    * Called at the end inside {@link AppliAbstract#amsAppStartInside()}
+    * </p>
     * 
-    * It might be the default window(s) or the last saved state
     */
    protected abstract void subAppStarted();
 
    /**
+    * The application {@link AppliAbstract} resume code has run already. Implementation may resume its objects and processes.
     * 
+    * <p>
+    * Called at the end inside {@link AppliAbstract#amsAppResume()}
+    * </p>
     */
    protected abstract void subAppResumed();
 

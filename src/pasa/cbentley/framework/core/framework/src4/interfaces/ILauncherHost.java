@@ -66,6 +66,7 @@ public interface ILauncherHost extends IStringable {
     */
    public CoordinatorAbstract getCoordinator();
 
+   
    /**
     * Specific {@link IDependencies} for the {@link ICreatorAppli}. 
     * 

@@ -163,7 +163,8 @@ public abstract class AppCtx extends ABOCtx implements IAInitable, IBOCtxSetting
    }
 
    /**
-    * Application context dependant. Implementation knows which launchers are available
+    * Application context dependant. Implementation knows which launchers are available.
+    * 
     * @param class1
     * @return
     */

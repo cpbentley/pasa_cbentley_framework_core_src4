@@ -19,9 +19,9 @@ public abstract class CreatorAppliAbstract extends ObjectU implements ICreatorAp
    protected final IConfigApp configApp;
 
    public CreatorAppliAbstract(UCtx uc) {
-      this(uc,null);
+      this(uc, null);
    }
-   
+
    public CreatorAppliAbstract(UCtx uc, IConfigApp configApp) {
       super(uc);
       this.configApp = configApp;
@@ -33,22 +33,22 @@ public abstract class CreatorAppliAbstract extends ObjectU implements ICreatorAp
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, CreatorAppliAbstract.class, "@line5");
+      dc.root(this, CreatorAppliAbstract.class, toStringGetLine(30));
       toStringPrivate(dc);
-      dc.nlLvl(configApp, "configApp");
       super.toString(dc.sup());
+      
+      dc.nlLvl(configApp, "configApp");
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, CreatorAppliAbstract.class, toStringGetLine(30));
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    private void toStringPrivate(Dctx dc) {
 
    }
-
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, CreatorAppliAbstract.class);
-      toStringPrivate(dc);
-      super.toString1Line(dc.sup1Line());
-   }
-
    //#enddebug
 
 }
